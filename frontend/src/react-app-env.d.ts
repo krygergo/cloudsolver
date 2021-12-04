@@ -1,7 +1,7 @@
 /// <reference types="react-scripts" />
 
 export interface Environment {
-    REACT_APP_GATEWAY_URL: string
+    REACT_APP_EXPRESS_URL: string
 }
 
 declare global {

@@ -11,12 +11,12 @@ const logger = createLogger(defaultConfig);
 const app = express();
 
 export const corsConfig: cors.CorsOptions = {
-    origin: env.NODE_ENV === "test" ? "test" : env.GATEWAY_ALLOW_ORIGIN,
+    origin: env.EXPRESS_ALLOW_ORIGIN,
     credentials: true
 }
 
 app.use(cors(corsConfig));
-logger.info(`Allows requests from origin ${env.GATEWAY_ALLOW_ORIGIN}`);
+logger.info(`Allows requests from origin ${env.EXPRESS_ALLOW_ORIGIN}`);
 
 app.use(express.json());
 app.get("/", (_, res) => res.send("Ok"));

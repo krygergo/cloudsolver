@@ -2,7 +2,7 @@ import googleEngineClusterManager from "../config/googleEngineClusterManager";
 
 const client = googleEngineClusterManager();
 
-export const getNodeQuantity = async () => {
+export const nodeQuantity = async () => {
     const [nodePools] = await client.listNodePools();
     return nodePools.nodePools?.length;
 }

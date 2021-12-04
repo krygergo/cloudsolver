@@ -1,10 +1,9 @@
 {
-  "name": "gateway",
+  "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
-    "prod": "node server.js",
+    "prod": "node build/server.js",
     "build": "tsc",
     "dev": "nodemon",
     "test": "jest test"
@@ -16,6 +15,7 @@
     "@google-cloud/connect-firestore": "^2.0.2",
     "@google-cloud/container": "^2.5.0",
     "@google-cloud/firestore": "^4.15.1",
+    "@google-cloud/storage": "^5.16.1",
     "@kubernetes/client-node": "^0.16.1",
     "axios": "^0.23.0",
     "bcrypt": "^5.0.1",

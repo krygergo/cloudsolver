@@ -1,4 +1,0 @@
-{
-    "ext": "ts",
-    "exec": "npx tsc && node dist/server.js"
-}

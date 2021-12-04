@@ -2,7 +2,7 @@ import { FirestoreStore } from "@google-cloud/connect-firestore";
 import { NextFunction, Request, Response, Router } from "express";
 import expressSession from "express-session";
 
-import { auth, login } from "../auth/auth";
+import { login } from "../auth/auth";
 import { signup } from "../auth/signup";
 import { route as fileRoute } from "../user/file/fileController";
 import { getUserSessionById } from "../session/sessionService";
@@ -17,7 +17,7 @@ const session = expressSession({
         dataset: firestore(),
         kind: "Session"
     }),
-    secret: env.NODE_ENV === "prod" ? env.GATEWAY_COOKIE_SECRET : "secret",
+    secret: env.NODE_ENV === "prod" ? env.EXPRESS_COOKIE_SECRET : "secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -44,12 +44,12 @@ const userSession = async (req: Request, res: Response, next: NextFunction) => {
 
 const route = Router();
 
-route.use("/cluster", clusterRoute);
 route.use(session);
 route.post("/signup", userInfo, signup);
 route.post("/login", userInfo, login);
 route.use(userSession);
 route.use("/user", userRoute);
 route.use("/file", fileRoute);
+route.use("/cluster", clusterRoute);
 
 export { route };

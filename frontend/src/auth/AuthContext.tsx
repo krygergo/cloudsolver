@@ -1,4 +1,5 @@
 import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react'
+import { useCookies } from 'react-cookie';
 import { User } from '../user/UserModels';
 import { getUser } from '../user/UserService';
 
@@ -16,18 +17,21 @@ export function useAuth() {
 export default function AuthProvider({children}: {children: ReactNode}) {
     const [user, setUser] = useState<User>();
     const [loading, setLoading] = useState(true);
+    const cookie = useCookies()[0]['cloudsolver.sid']
 
     useEffect(() => {
         (async () => {
-            try {
-                const userResponse = await getUser();
-                setUser(userResponse.data);
-            } catch(error) {
-                
+            if(cookie) {
+                try {
+                    const userResponse = await getUser();
+                    setUser(userResponse.data);
+                } catch(error) {
+                    
+                }
             }
             setLoading(false);
         })();
-    }, [])
+    }, [cookie])
 
     return (
         <AuthContext.Provider value={{

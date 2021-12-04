@@ -2,7 +2,7 @@ import axios, { AxiosRequestConfig } from "axios"
 import { env } from "../config/environment"
 
 const config: AxiosRequestConfig = {
-    baseURL: env.REACT_APP_GATEWAY_URL,
+    baseURL: env.REACT_APP_EXPRESS_URL,
     withCredentials: true
 }
 

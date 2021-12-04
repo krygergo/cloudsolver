@@ -3,7 +3,7 @@
         "lib": ["ESNext"],
         "module": "commonJs",
         "target": "esnext",
-        "outDir": "dist",
+        "outDir": "build",
         "noImplicitAny": true,
         "preserveConstEnums": true,
         "sourceMap": true,
@@ -12,6 +12,6 @@
         "skipLibCheck": true,
         "moduleResolution": "node"
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "../gateway/src/user/file"],
     "exclude": ["node_modules"]
 }

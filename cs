@@ -30,22 +30,26 @@ main () {
 }
 
 deploy () {
-    docker-compose -f docker-compose.dev.yml up -d
+    docker-compose -f frontend/docker-compose.yml up -d && \
+    docker-compose -f backend/docker-compose.yml up -d && \
+    docker-compose -f emulator/docker-compose.yml up -d
 }
 
 stop () {
-    if [ "$(docker container inspect -f '{{.State.Running}}' gateway)" == "true" ]
+    if [ "$(docker container inspect -f '{{.State.Running}}' express)" == "true" ]
         then
-            docker stop gateway
+            docker stop express
     fi
-    if [ "$(docker container inspect -f '{{.State.Running}}' firestore)" == "true" ]
+    if [ "$(docker container inspect -f '{{.State.Running}}' emulator)" == "true" ]
         then
-            docker stop firestore
+            docker stop emulator
     fi
 }
 
 build () {
-    docker-compose -f docker-compose.dev.yml build
+    docker-compose -f backend/docker-compose.yml \
+                   -f emulator/docker-compose.yml \
+                   build
 }
 
 test () {
@@ -69,14 +73,14 @@ statusContainer () {
 status () {
     if [ $# -eq 0 ]
         then
-            statusContainer gateway 3001; statusContainer firestore 8080; return
+            statusContainer express 3001; statusContainer emulator 8080; return
     fi
     case $1 in
         express)
-            statusContainer gateway 3001
+            statusContainer express 3001
             ;;
-        firestore)
-            statusContainer firestore 8080
+        emulator)
+            statusContainer emulator 8080
             ;;
         *)
             help
@@ -85,22 +89,22 @@ status () {
 }
 
 reset () {
-    docker rm gateway firestore &&
-    docker rmi gateway-server:latest firestore-emulator:latest
+    docker rm express emulator &&
+    docker rmi express-server:latest emulator:latest
 }
 
 help () {
     printf "\n"
-    printf "Specified commands for the gateway\n\n"
+    printf "Specified commands for developing\n\n"
     printf "Options:\n"
-    printf "    dp, deploy                    Deploy the gateway for local developing\n"
-    printf "    stop                          Stop all running gateway containers\n"
-    printf "    build                         Build or rebuild gateway images\n"
+    printf "    dp, deploy                    Deploy express for local developing\n"
+    printf "    stop                          Stop all running containers\n"
+    printf "    build                         Build or rebuild images\n"
     printf "    test                          Run unit tests\n"
     printf "    st, status                    See status of all containers\n"
-    printf "    st, status gateway            See status of gateway\n"
-    printf "    st, status firestore          See status of firestore\n"
-    printf "    rs, reset                     Reset gateway containers\n"
+    printf "    st, status express            See status of express\n"
+    printf "    st, status emulator           See status of emulator\n"
+    printf "    rs, reset                     Reset containers\n"
     printf "\n"
 }
 

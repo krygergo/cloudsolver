@@ -22,14 +22,10 @@ export const addFile = async (userId: string, fileUpload: UploadedFile) => {
     const timeStamp = Date.now();
     batch.set(file, {
         id: file.id,
-        name: fileUpload.name,
-        type: getFileType(fileUpload.name)!,
         fileBinaryId: fileBinary.id,
-        size: fileUpload.size,
-        encoding: fileUpload.encoding,
-        checksum: fileUpload.md5,
         createdAt: timeStamp,
-        updatedAt: timeStamp
+        updatedAt: timeStamp,
+        ...(({data, mv, ...rest}) => rest)(fileUpload)
     });
     return batch.commit();
 }

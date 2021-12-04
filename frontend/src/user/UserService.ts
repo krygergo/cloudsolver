@@ -1,4 +1,4 @@
-import { get, post } from "../api/gateway";
+import { get, post } from "../api/express";
 import { User } from "./UserModels";
 
 export const signupUser = (username: string, password: string) => post("/signup", {

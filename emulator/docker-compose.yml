@@ -1,0 +1,23 @@
+services:
+  emulator_build:
+    container_name: emulator_base
+    image: firebase-emulator-base
+    build:
+      context: .
+      dockerfile: Dockerfile.emulator
+  emulator:
+    container_name: emulator
+    image: firebase-emulator
+    build: .
+    ports:
+      - 8080:8080
+      - 9199:9199
+      - 4000:4000
+    depends_on:
+      - emulator_build
+    networks:
+      - cloudsolver
+      
+networks:
+  cloudsolver:
+    external: true

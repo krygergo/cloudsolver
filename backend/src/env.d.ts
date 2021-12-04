@@ -3,8 +3,8 @@ import { File } from "./user/file/fileModel";
 
 export interface Environment {
     NODE_ENV: string
-    GATEWAY_COOKIE_SECRET: string
-    GATEWAY_ALLOW_ORIGIN: string
+    EXPRESS_COOKIE_SECRET: string
+    EXPRESS_ALLOW_ORIGIN: string
 }
 
 declare global {
