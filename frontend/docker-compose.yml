@@ -1,0 +1,11 @@
+services:
+  webapp:
+    container_name: frontend
+    image: frontend-webapp
+    build: .
+    environment:
+      - REACT_APP_GATEWAY_URL=http://localhost:3001
+    volumes: 
+      - ./src:/app/src
+    ports: 
+      - 3000:3000

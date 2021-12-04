@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: cloudsolver-managed-cert
+spec:
+  domains:
+    - cloudsolver.xyz
+    - api.cloudsolver.xyz

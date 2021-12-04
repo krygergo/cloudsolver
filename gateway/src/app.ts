@@ -1,0 +1,25 @@
+import cors from "cors";
+import express from "express";
+import { createLogger } from "winston";
+
+import { env } from "./config/environment";
+import { defaultConfig } from "./config/logger";
+import { route as apiRoute } from "./config/routing";
+
+const logger = createLogger(defaultConfig);
+
+const app = express();
+
+export const corsConfig: cors.CorsOptions = {
+    origin: env.NODE_ENV === "test" ? "test" : env.GATEWAY_ALLOW_ORIGIN,
+    credentials: true
+}
+
+app.use(cors(corsConfig));
+logger.info(`Allows requests from origin ${env.GATEWAY_ALLOW_ORIGIN}`);
+
+app.use(express.json());
+app.get("/", (_, res) => res.send("Ok"));
+app.use("/", apiRoute);
+
+export { app };

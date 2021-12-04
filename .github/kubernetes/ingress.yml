@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cloudsolver-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "cloudsolver-ingress-ip"
+    networking.gke.io/managed-certificates: cloudsolver-managed-cert
+    networking.gke.io/v1beta1.FrontendConfig: https-redirect-config
+spec:
+  rules:
+  - host: cloudsolver.xyz
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 3000
+  - host: api.cloudsolver.xyz
+    http:
+      paths:
+      - path: /*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: gateway-service
+            port:
+              number: 3000
+---
+apiVersion: networking.gke.io/v1beta1
+kind: FrontendConfig
+metadata:
+  name: https-redirect-config
+spec:
+  redirectToHttps:
+    enabled: true
+    responseCodeName: PERMANENT_REDIRECT

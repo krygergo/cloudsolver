@@ -1,0 +1,8 @@
+**/node_modules
+.gitignore
+.idea
+docker-compose.dev.yml
+Dockerfile.development
+Dockerfile.firestore
+Dockerfile.production
+gateway

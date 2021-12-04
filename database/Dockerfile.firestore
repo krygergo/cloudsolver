@@ -1,0 +1,22 @@
+FROM ubuntu
+
+WORKDIR /app
+
+COPY .firebaserc ./
+COPY firebase.json ./
+
+RUN apt-get update && \
+    apt-get install -y curl && \ 
+    apt-get install -y sudo
+
+RUN apt-get install -y openjdk-11-jdk-headless
+
+RUN curl -sL https://deb.nodesource.com/setup_16.x -o nodesource_setup.sh
+RUN bash nodesource_setup.sh && apt install -y nodejs
+
+RUN curl -sL https://firebase.tools | bash
+
+EXPOSE 8080
+EXPOSE 4000
+
+CMD firebase emulators:start

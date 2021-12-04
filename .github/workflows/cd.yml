@@ -1,0 +1,74 @@
+name: CD
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+    paths: [ src, package*.json, tsconfig.json ]
+    
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  LOCATION: europe-west1
+  REPOSITORY: gateway
+  IMAGE: gateway_prod
+  GKE_CLUSTER: cloudsolver
+  
+jobs:
+  deployment:
+
+    if: github.event.pull_request.merged == true
+    
+    runs-on: ubuntu-latest
+    environment: production
+
+    strategy:
+      matrix:
+        node-version: [ 16.13.0 ]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@master
+      with: 
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+      
+    - name: Configure docker gcloud
+      run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+    
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci --silent
+    
+    - name: Compile src code
+      run: npm run build
+    
+    - name: Build docker image
+      run: |-
+        docker build -f Dockerfile.production \
+        --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
+        .
+
+    - name: Publish to artifact registry
+      run: docker push "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+
+    - name: Connect to cluster
+      uses: google-github-actions/get-gke-credentials@main
+      with:
+        cluster_name: ${{ env.GKE_CLUSTER }}
+        location: ${{ env.LOCATION }}
+        credentials: ${{ secrets.GKE_SA_KEY }}
+    
+    - name: Add commit hash
+      run: |-
+        envsubst < .github/kubernetes/deployment.yml > temp_file
+        mv temp_file .github/kubernetes/deployment.yml
+        
+    - name: Deploy
+      run: kubectl apply -f .github/kubernetes
+      

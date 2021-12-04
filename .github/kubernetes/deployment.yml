@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: gateway
+  template:
+    metadata:
+      labels:
+        app: gateway
+    spec:
+      containers:
+      - name: gateway
+        image: europe-west1-docker.pkg.dev/dm885-cloud-solver/gateway/gateway_prod:${GITHUB_SHA}
+        ports:
+        - containerPort: 3000
+        volumeMounts:
+        - name: keys
+          mountPath: /keys
+          readOnly: true
+        env:
+          - name: GOOGLE_APPLICATION_CREDENTIALS
+            value: "/keys/firestore-api-key.json"
+          - name: ALLOW_ORIGIN
+            value: "https://cloudsolver.xyz"
+          - name: PROGRAM_STAGE
+            value: "prod"
+          - name: GATEWAY_COOKIE_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: gateway-cookie-secret
+                key: secret
+      volumes:
+      - name: keys
+        secret:
+          secretName: firestore-api-key
