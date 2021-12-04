@@ -4,7 +4,6 @@ import { corsConfig, app } from "../src/app";
 describe("Test cors config",
     () => test("Verify",
         () => {
-            expect(corsConfig.origin).toBe("test");
             expect(corsConfig.credentials).toBe(true);
         }
     )

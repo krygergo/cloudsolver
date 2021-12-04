@@ -12,6 +12,6 @@
         "skipLibCheck": true,
         "moduleResolution": "node"
     },
-    "include": ["src/**/*", "../gateway/src/user/file"],
+    "include": ["src/**/*", "test/**/*"],
     "exclude": ["node_modules"]
 }
