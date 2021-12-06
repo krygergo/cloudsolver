@@ -20,11 +20,13 @@ const session = expressSession({
     secret: env.NODE_ENV === "prod" ? env.EXPRESS_COOKIE_SECRET : "secret",
     resave: false,
     saveUninitialized: false,
+    proxy: process.env.NODE_ENV === "prod",
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        httpOnly: process.env.NODE_ENV === "prod",
-        secure: process.env.NODE_ENV === "prod",
-        sameSite: process.env.NODE_ENV === "prod" ? "none" : "strict"
+        httpOnly: env.NODE_ENV === "prod",
+        secure: env.NODE_ENV === "prod",
+        sameSite: env.NODE_ENV === "prod" ? "none" : "strict",
+        domain: env.NODE_ENV === "prod" ? env.EXPRESS_ALLOW_ORIGIN.slice("https://".length) : env.EXPRESS_ALLOW_ORIGIN.slice("http://".length)
     }
 });
 

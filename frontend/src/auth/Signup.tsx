@@ -2,24 +2,20 @@ import { AxiosError } from 'axios';
 import React, { FormEvent, useRef } from 'react'
 import { Container, Row, Form, Button } from 'react-bootstrap';
 import { Link, useHistory } from 'react-router-dom';
-import { getUser, signupUser } from '../user/UserService';
-import { useAuth } from './AuthContext';
+import { env } from '../config/environment';
+import { signupUser } from '../user/UserService';
 
 
 export default function Signup() {
     const usernameRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
-    const setUser = useAuth()?.setUser;
     const history = useHistory();
 
     async function signupSubmit(formEvent: FormEvent) {
         formEvent.preventDefault();
-        if(!setUser) return;
         if(!usernameRef.current?.value || !passwordRef.current?.value) return;
         try {
-            await signupUser(usernameRef.current?.value, passwordRef.current?.value);
-            const user = (await getUser()).data;
-            setUser(user);
+            const response = await signupUser(usernameRef.current?.value, passwordRef.current?.value);
             history.push("/");
         } catch(error) {
             const err = error as AxiosError;

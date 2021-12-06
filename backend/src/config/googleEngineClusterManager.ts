@@ -1,7 +1,5 @@
 import { ClusterManagerClient } from "@google-cloud/container";
 
-const client = new ClusterManagerClient({
-    projectId: "dm885-cloud-solver"
-});
+const client = new ClusterManagerClient();
 
 export default () => client;

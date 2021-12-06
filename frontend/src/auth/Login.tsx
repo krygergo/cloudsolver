@@ -8,17 +8,13 @@ import { useAuth } from './AuthContext';
 export default function Login() {
     const usernameRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
-    const setUser = useAuth()?.setUser;
     const history = useHistory();
 
     async function loginSubmit(formEvent: FormEvent) {
         formEvent.preventDefault();
-        if(!setUser) return;
         if(!usernameRef.current?.value || !passwordRef.current?.value) return;
         try {
             await loginUser(usernameRef.current?.value, passwordRef.current?.value);
-            const user = (await getUser()).data;
-            setUser(user);
             history.push("/");
         } catch(error) {
             const err = error as AxiosError;

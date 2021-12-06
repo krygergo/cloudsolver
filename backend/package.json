@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "prod": "node build/server.js",
+    "prod": "node server.js",
     "build": "tsc",
     "dev": "nodemon",
     "test": "jest test"

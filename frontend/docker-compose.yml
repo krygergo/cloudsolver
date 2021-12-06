@@ -2,9 +2,9 @@ services:
   react:
     container_name: react
     image: react-frontend
-    build: .
-    environment:
-      - REACT_APP_EXPRESS_URL=http://localhost:3001
+    build:
+      context: .
+      dockerfile: Dockerfile.development
     volumes: 
       - ./src:/app/src
     ports: 

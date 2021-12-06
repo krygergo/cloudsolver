@@ -3,8 +3,9 @@ kind: Ingress
 metadata:
   name: cloudsolver-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: "cloudsolver-ingress-ip"
+    kubernetes.io/ingress.global-static-ip-name: cloudsolver-static-ip
     networking.gke.io/managed-certificates: cloudsolver-managed-cert
+    kubernetes.io/ingress.allow-http: "true"
     networking.gke.io/v1beta1.FrontendConfig: https-redirect-config
 spec:
   rules:
@@ -15,7 +16,7 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: frontend-service
+            name: react-service
             port:
               number: 3000
   - host: api.cloudsolver.xyz
@@ -25,7 +26,7 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: gateway-service
+            name: express-service
             port:
               number: 3000
 ---
