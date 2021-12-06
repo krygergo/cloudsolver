@@ -26,7 +26,7 @@ const session = expressSession({
         httpOnly: env.NODE_ENV === "prod",
         secure: env.NODE_ENV === "prod",
         sameSite: env.NODE_ENV === "prod" ? "none" : "strict",
-        domain: env.NODE_ENV === "prod" ? env.EXPRESS_ALLOW_ORIGIN.slice("https://".length) : env.EXPRESS_ALLOW_ORIGIN.slice("http://".length)
+        domain: env.EXPRESS_ALLOW_ORIGIN
     }
 });
 
