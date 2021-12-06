@@ -1,5 +1,5 @@
 import React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 import Dashboard from '../dashboard/Dashboard'
 import Administrator from '../dashboard/Administrator';
 import AdminRoute from '../dashboard/AdminRoute';
