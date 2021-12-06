@@ -20,9 +20,9 @@ function App() {
           </Row>
           <Row className="flex-grow-1">
             <Switch>
-              <AuthUserRoute exact path="/" component={UserRoute} />
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />
+              <AuthUserRoute path="/" component={UserRoute} />
             </Switch>
           </Row>
         </AuthProvider>

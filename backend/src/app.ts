@@ -14,7 +14,7 @@ export const corsConfig: cors.CorsOptions = {
     origin: env.EXPRESS_ALLOW_ORIGIN,
     credentials: true
 }
-
+app.set("trust proxy", 1);
 app.use(cors(corsConfig));
 logger.info(`Allows requests from origin ${env.EXPRESS_ALLOW_ORIGIN}`);
 

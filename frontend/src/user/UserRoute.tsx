@@ -7,10 +7,10 @@ import Settings from '../dashboard/Settings'
 
 export default function UserRoute() {
     return (
-        <Switch>
+        <>
             <Route exact path="/" component={Dashboard}/>
             <Route path="/settings" component={Settings}/>
             <AdminRoute path="/administrator" component={Administrator}/>
-        </Switch>
+        </>
     );
 }

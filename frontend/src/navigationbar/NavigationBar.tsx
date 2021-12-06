@@ -5,6 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import { isAdministrator } from '../user/UserUtils';
 import { User } from '../user/UserModels';
 import { useCookies } from 'react-cookie';
+import { env } from '../config/environment';
 
 export default function NavigationBar() {
   const auth = useAuth();
@@ -29,10 +30,10 @@ export default function NavigationBar() {
 function NavigationBarUser() {
   const {user, setUser} = useAuth() as {user: User, setUser: React.Dispatch<React.SetStateAction<User | undefined>>};
   const history = useHistory();
-  const removeCookie = useCookies(['cloudsolver.sid'])[2];
+  const removeCookies = useCookies(["cloudsolver.auth"])[2];
   
   async function logout() {
-    removeCookie("cloudsolver.sid");
+    removeCookies("cloudsolver.auth", { path: "/", domain: env.REACT_APP_DOMAIN });
     setUser(undefined);
     history.push("/");
   }

@@ -1,5 +1,5 @@
 import { FirestoreStore } from "@google-cloud/connect-firestore";
-import { NextFunction, Request, Response, Router } from "express";
+import { CookieOptions, NextFunction, Request, Response, Router } from "express";
 import expressSession from "express-session";
 
 import { login } from "../auth/auth";
@@ -20,12 +20,11 @@ const session = expressSession({
     secret: env.NODE_ENV === "prod" ? env.EXPRESS_COOKIE_SECRET : "secret",
     resave: true,
     saveUninitialized: false,
-    proxy: process.env.NODE_ENV === "prod",
     cookie: {
         maxAge: 1000 * 60 * 60 * 24 * 7,
-        httpOnly: env.NODE_ENV === "prod",
+        httpOnly: true,
         secure: env.NODE_ENV === "prod",
-        sameSite: env.NODE_ENV === "prod" ? "none" : "strict",
+        sameSite: env.NODE_ENV === "prod" ? "none" : "lax",
         ...(env.NODE_ENV === "prod" ? {domain: env.EXPRESS_ALLOW_ORIGIN.slice("https://".length)} : {})
     }
 });
@@ -44,11 +43,17 @@ const userSession = async (req: Request, res: Response, next: NextFunction) => {
     next();
 }
 
+const authCookie: CookieOptions = {
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    httpOnly: false,
+    ...(env.NODE_ENV === "prod" ? {domain: env.EXPRESS_ALLOW_ORIGIN.slice("https://".length)} : {})
+}
+
 const route = Router();
 
 route.use(session);
-route.post("/signup", userInfo, signup);
-route.post("/login", userInfo, login);
+route.post("/signup", userInfo, signup(authCookie));
+route.post("/login", userInfo, login(authCookie));
 route.use(userSession);
 route.use("/user", userRoute);
 route.use("/file", fileRoute);

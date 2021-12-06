@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { CookieOptions, NextFunction, Request, Response } from "express";
 import { getUserByUsername, getUserById, verifyUserPassword } from "../user/userService";
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
@@ -13,7 +13,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     next();
 }
 
-export const login = async (req: Request, res: Response) => {
+export const login = (authCookie: CookieOptions) => async (req: Request, res: Response) => {
     const credentials = req.body as { username: string, password: string };
     const user = await getUserByUsername(credentials.username);
     if(!user)
@@ -21,5 +21,6 @@ export const login = async (req: Request, res: Response) => {
     if(!await verifyUserPassword(credentials.password, user.hashedPassword))
         return res.status(403).send("Wrong credentials");
     req.session.userId = user.id!;
+    res.cookie("cloudsolver.auth", true, authCookie);
     res.status(200).send("Successfully log in");
 }

@@ -5,5 +5,3 @@ docker-compose.dev.yml
 Dockerfile.development
 Dockerfile.firestore
 Dockerfile.production
-gateway
-build

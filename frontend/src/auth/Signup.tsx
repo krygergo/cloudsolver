@@ -34,7 +34,7 @@ export default function Signup() {
     return (
         <Container className="d-flex flex-column-reverse">
             <Row className="w-100 text-center mb-2">
-                <Link to="/Login" style={{
+                <Link to="/login" style={{
                     textDecoration: "none"
                 }}>
                     <b className="fs-4">Log In</b>
