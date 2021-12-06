@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+SOLVER=${1?Error: assign solver}
+#MZN=${2?Error: no MZN file}
+#DZN=${3?Error: no DZN file}
+shift 1
+ARGS="$*"
+#if [[ $MZN != *.mzn ]]; then
+#	echo "not in mzn format"
+#	exit 1
+#fi
+#if [[ $DZN != *.dzn ]]; then
+#	echo "not in DZN format"
+#	exit 1
+#fi
+if [ -z "$ARGS" ]; 
+then
+	result=$(minizinc --solver $SOLVER values/model.mzn values/data.dzn)
+else
+	result=$(minizinc $ARGS --solver $SOLVER modssel.mzn dassta.dzn)
+
+fi
+echo "$result"
+#curl -X POST  https://en72ahl97t1grcv.m.pipedream.net  -H "Content-Type: application/json" -d '{ "solverResult":"'"$result"'" }'

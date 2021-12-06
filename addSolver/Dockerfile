@@ -1,9 +1,12 @@
-FROM google/cloud-sdk:latest
-COPY dm885-cloud-solver-e787ef682b18.json /
-#RUN    StorageOptions storageOptions = StorageOptions.newBuilder().setProjectId("dm885-cloud-solver").setCredentials(GoogleCredentials.fromStream(new FileInputStream("dm885-cloud-solver-e787ef682b18.json"))).build();
-#RUN    Storage storage = storageOptions.getService();COPY solverAdd ./
-#RUN gcloud auth login bmbt95@gmail.com
-#RUN gcloud auth activate-service-account get-service@dm885-cloud-solver.iam.gserviceaccount.com --key-file /dm885-cloud-solver-e787ef682b18.json
-COPY ./solverAdd /
-CMD ["echo" "Hello world","ls"]
-ENTRYPOINT ["bash", "/solverAdd" ]
+FROM google/cloud-sdk:alpine as gcloud
+
+WORKDIR /app
+ARG KEY_FILE_CONTENT
+#RUN echo $KEY_FILE_CONTENT | gcloud auth activate-service-account get-service@dm885-cloud-solver.iam.gserviceaccount.com --key-file=-
+RUN echo $KEY_FILE_CONTENT | gcloud auth activate-service-account get-service@dm885-cloud-solver.iam.gserviceaccount.com --key-file=- \
+  && gsutil cp -r gs://dm885-cloud-solver.appspot.com/Solvers ./
+
+FROM minizinc/minizinc
+COPY --from=gcloud /app/Solvers /usr/local/share/minizinc/solvers
+COPY ./executer /
+ENTRYPOINT [ "bash", "/executer" ]
