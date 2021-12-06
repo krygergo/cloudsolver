@@ -8,7 +8,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     const user = await getUserById(req.session.userId!);
     if(!user)
         return res.status(403).send("User doesn't exist");
-    if(!verifyUserPassword(password, user.hashedPassword))
+    if(!await verifyUserPassword(password, user.hashedPassword))
         return res.status(403).send("Wrong credentials");
     next();
 }
@@ -18,7 +18,7 @@ export const login = async (req: Request, res: Response) => {
     const user = await getUserByUsername(credentials.username);
     if(!user)
         return res.status(403).send("User doesn't exist");
-    if(!verifyUserPassword(credentials.password, user.hashedPassword))
+    if(!await verifyUserPassword(credentials.password, user.hashedPassword))
         return res.status(403).send("Wrong credentials");
     req.session.userId = user.id!;
     res.status(200).send("Successfully log in");
