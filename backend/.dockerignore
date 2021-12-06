@@ -6,3 +6,4 @@ Dockerfile.development
 Dockerfile.firestore
 Dockerfile.production
 gateway
+build

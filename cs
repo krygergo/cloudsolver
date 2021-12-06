@@ -30,8 +30,8 @@ main () {
 }
 
 deploy () {
-    docker-compose -f frontend/docker-compose.yml up -d && \
     docker-compose -f backend/docker-compose.yml up -d && \
+    docker-compose -f frontend/docker-compose.yml up -d && \
     docker-compose -f emulator/docker-compose.yml up -d
 }
 
