@@ -18,7 +18,7 @@ const session = expressSession({
         kind: "Session"
     }),
     secret: env.NODE_ENV === "prod" ? env.EXPRESS_COOKIE_SECRET : "secret",
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     proxy: process.env.NODE_ENV === "prod",
     cookie: {
@@ -26,7 +26,7 @@ const session = expressSession({
         httpOnly: env.NODE_ENV === "prod",
         secure: env.NODE_ENV === "prod",
         sameSite: env.NODE_ENV === "prod" ? "none" : "strict",
-        domain: env.EXPRESS_ALLOW_ORIGIN
+        domain: env.NODE_ENV === "prod" ? env.EXPRESS_ALLOW_ORIGIN.slice("https://".length) : env.EXPRESS_ALLOW_ORIGIN.slice("http://".length)
     }
 });
 
