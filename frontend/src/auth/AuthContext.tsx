@@ -17,21 +17,15 @@ export function useAuth() {
 export default function AuthProvider({children}: {children: ReactNode}) {
     const [user, setUser] = useState<User>();
     const [loading, setLoading] = useState(true);
-    const cookie = useCookies()[0]['cloudsolver.sid']
+    const cookies = useCookies()[0];
 
     useEffect(() => {
         (async () => {
-            if(cookie) {
-                try {
-                    const userResponse = await getUser();
-                    setUser(userResponse.data);
-                } catch(error) {
-                    
-                }
-            }
+            if(cookies["cloudsolver.sid"] && !user)
+                setUser((await getUser()).data);
             setLoading(false);
         })();
-    }, [cookie])
+    }, [cookies, user]);
 
     return (
         <AuthContext.Provider value={{

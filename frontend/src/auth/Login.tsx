@@ -1,20 +1,26 @@
 import { AxiosError } from 'axios';
 import React, { FormEvent, useRef } from 'react'
 import { Button, Form, Container, Row } from 'react-bootstrap';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, Redirect, useHistory } from 'react-router-dom';
 import { getUser, loginUser } from '../user/UserService';
 import { useAuth } from './AuthContext';
 
 export default function Login() {
     const usernameRef = useRef<HTMLInputElement>(null);
     const passwordRef = useRef<HTMLInputElement>(null);
+    const userState = useAuth();
     const history = useHistory();
+
+    if(userState?.user)
+        return <Redirect to="/" />
 
     async function loginSubmit(formEvent: FormEvent) {
         formEvent.preventDefault();
+        if(!userState?.setUser) return;
         if(!usernameRef.current?.value || !passwordRef.current?.value) return;
         try {
             await loginUser(usernameRef.current?.value, passwordRef.current?.value);
+            userState.setUser((await getUser()).data);
             history.push("/");
         } catch(error) {
             const err = error as AxiosError;

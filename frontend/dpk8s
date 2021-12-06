@@ -1,0 +1,7 @@
+#!/bin/bash
+
+npm run build && \
+docker build -f Dockerfile.production --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/frontend/react:latest" . && \
+docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/frontend/react:latest" && \
+kubectl delete deployments react && \
+kubectl apply -f ../.github/kubernetes/frontend/deployment.yml
