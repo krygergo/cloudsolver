@@ -10,3 +10,4 @@ FROM minizinc/minizinc
 COPY --from=gcloud /app/Solvers /usr/local/share/minizinc/solvers
 COPY ./executer /
 ENTRYPOINT [ "bash", "/executer" ]
+CMD [ "ls" ]
