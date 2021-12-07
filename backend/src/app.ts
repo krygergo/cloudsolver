@@ -11,7 +11,7 @@ const logger = createLogger(defaultConfig);
 const app = express();
 
 export const corsConfig: cors.CorsOptions = {
-    origin: env.EXPRESS_ALLOW_ORIGIN,
+    origin: env.NODE_ENV === "test" ? "test" : env.EXPRESS_ALLOW_ORIGIN,
     credentials: true
 }
 app.set("trust proxy", 1);
