@@ -1,5 +1,4 @@
 import React from 'react';
-import AuthProvider from './auth/AuthContext';
 import {BrowserRouter, Route, Switch} from 'react-router-dom';
 import NavigationBar from './navigationbar/NavigationBar';
 import Login from './auth/Login';
@@ -14,7 +13,6 @@ function App() {
       <Container fluid className="vh-100 d-flex flex-column" style={{
         backgroundImage: "linear-gradient(rgba(4,9,30,0.75),rgba(4,9,30,0.75)),url(/cloud_background.jpg)"
       }}>
-        <AuthProvider>
           <Row>
             <NavigationBar/>
           </Row>
@@ -25,7 +23,6 @@ function App() {
               <AuthUserRoute path="/" component={UserRoute} />
             </Switch>
           </Row>
-        </AuthProvider>
       </Container>
     </BrowserRouter>
   );

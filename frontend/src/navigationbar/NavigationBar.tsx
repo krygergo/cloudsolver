@@ -3,9 +3,6 @@ import { Col, Container, Navbar, Image } from 'react-bootstrap'
 import { Link, useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
 import { isAdministrator } from '../user/UserUtils';
-import { User } from '../user/UserModels';
-import { useCookies } from 'react-cookie';
-import { env } from '../config/environment';
 
 export default function NavigationBar() {
   const auth = useAuth();
@@ -28,20 +25,22 @@ export default function NavigationBar() {
 }
 
 function NavigationBarUser() {
-  const {user, setUser} = useAuth() as {user: User, setUser: React.Dispatch<React.SetStateAction<User | undefined>>};
+  const { user, logout } = useAuth()!;
   const history = useHistory();
-  const removeCookies = useCookies(["cloudsolver.auth"])[2];
   
-  async function logout() {
-    removeCookies("cloudsolver.auth", { path: "/", domain: env.REACT_APP_DOMAIN });
-    setUser(undefined);
+  const logoutLink = async () => {
+    try {
+      await logout();
+    } catch(error) {
+
+    }
     history.push("/");
   }
 
   return (
     <Container className="p-0 d-flex flex-column align-items-end">
       <Container className="p-0 d-flex justify-content-end">
-        { isAdministrator(user.userRight) ? 
+        { isAdministrator(user?.userRight!) ? 
           <Link to="/administrator">
             <Image src="/administrator_icon.png"/>
           </Link> : <></> 
@@ -49,11 +48,11 @@ function NavigationBarUser() {
         <Link to="/settings">
           <Image className="ms-1" src="/settings_icon.png"/>
         </Link>
-        <Link to="/" onClick={logout}>
+        <Link to="/" onClick={logoutLink}>
           <Image className="ms-1" src="/logout_icon.png"/>
         </Link>
       </Container>
-      <b className="text-muted">{user.username}</b>
+      <b className="text-muted">{user?.username!}</b>
     </Container>
   );
 }

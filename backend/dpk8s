@@ -1,0 +1,7 @@
+#!/bin/bash
+
+npm run build && \
+docker build -f Dockerfile.production --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:latest" . && \
+docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:latest" && \
+kubectl delete deployments express && \
+kubectl apply -f ../.github/kubernetes/backend/deployment.yml
