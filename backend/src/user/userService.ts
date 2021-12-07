@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import collection, { DEFAULT_VCPU } from "./userModel";
+import collection from "./userModel";
 
 const createUser = () => collection().doc();
 
-export const addUser = async (username: string, password: string) => {
+export async function addUser(username: string, password: string) {
     const userSnapshot = await collection().where("username", "==", username).get();
     if(!userSnapshot.empty)
         return undefined;
@@ -13,7 +13,6 @@ export const addUser = async (username: string, password: string) => {
         username: username,
         hashedPassword: await bcrypt.hash(password, 10),
         userRight: "DEFAULT",
-        vCPU: DEFAULT_VCPU,
         createdAt: Date.now()
     });
     return user.id;

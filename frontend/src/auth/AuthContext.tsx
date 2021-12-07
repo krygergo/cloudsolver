@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 import React, { createContext, ReactNode, useContext, useState, useEffect } from 'react'
 import { useCookies } from 'react-cookie';
 import { env } from '../config/environment';
-import { User } from '../user/UserModels';
+import { User } from '../user/UserModel';
 import { getUser, loginUser, signupUser } from '../user/UserService';
 
 type Auth = {
@@ -21,7 +21,7 @@ export function useAuth() {
 export default function AuthProvider({children}: {children: ReactNode}) {
     const [user, setUser] = useState<User>();
     const [loading, setLoading] = useState(true);
-    const [cookies, _, removeCookies] = useCookies(["cloudsolver.auth"]);
+    const [cookies, , removeCookies] = useCookies(["cloudsolver.auth"]);
 
     const login = async (username: string, password: string) => {
         try {

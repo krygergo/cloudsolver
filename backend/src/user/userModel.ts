@@ -1,8 +1,6 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 import firestore from "../config/googleFirestore";
 
-export const DEFAULT_VCPU = 3;
-
 type UserRight = "ADMIN" | "DEFAULT"
 
 export interface User {
@@ -10,7 +8,6 @@ export interface User {
     username: string
     hashedPassword: string
     userRight: UserRight
-    vCPU: number
     createdAt: number
 }
 

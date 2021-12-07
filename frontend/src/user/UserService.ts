@@ -1,5 +1,5 @@
 import { get, post } from "../api/express";
-import { User } from "./UserModels";
+import { User } from "./UserModel";
 
 export const signupUser = (username: string, password: string) => post("/signup", {
     username: username,

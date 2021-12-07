@@ -6,7 +6,7 @@
     "prod": "node server.js",
     "build": "tsc",
     "dev": "nodemon",
-    "test": "jest test"
+    "test": "jest ./test"
   },
   "keywords": [],
   "author": "",

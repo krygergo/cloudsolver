@@ -1,9 +1,5 @@
 import supertest from "supertest";
-import { corsConfig, app } from "../src/app";
-import request from "supertest";
-import { response } from "express";
-import { doesNotMatch } from "assert";
-
+import app, { corsConfig } from "../src/app";
 
 describe("Test cors config",
     () => test("Verify",
@@ -36,29 +32,11 @@ describe("User creation FAIL", () => {
     test("Create user wihtout username", async () => {
         const user_data2 ={
             "password": "teste2r"
-            
         }
 
         await supertest(app)
         .post("/signup")
         .send(user_data2)
         .expect(400)
-
     })
-});
-
-
-describe("POST /signup", () => {
-    it("returns status code 201 if first name is passed", async () => {
-      const res = await request(app)
-        .post("/")
-        .send(
-            { username: "test",
-            password: "teest"
-        
-        });
-        
-      // toEqual recursively checks every field of an object or array.
-      expect(res.statusCode).toEqual(201);
-    });
 });

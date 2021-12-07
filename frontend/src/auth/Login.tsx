@@ -12,7 +12,7 @@ export default function Login() {
     if(user)
         return <Redirect to="/" />
 
-    async function loginSubmit(formEvent: FormEvent) {
+    const loginSubmit = async (formEvent: FormEvent) => {
         formEvent.preventDefault();
         if(!usernameRef.current?.value || !passwordRef.current?.value) return;
         try {

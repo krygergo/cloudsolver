@@ -1,5 +1,3 @@
-import { UserRights } from "./UserModels";
+import { UserRights } from "./UserModel";
 
-export function isAdministrator(userRight: UserRights) {
-    return userRight === UserRights.ADMIN
-}
+export const isAdministrator = (userRight: UserRights) => userRight === UserRights.ADMIN

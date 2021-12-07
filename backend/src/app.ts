@@ -22,4 +22,4 @@ app.use(express.json());
 app.get("/", (_, res) => res.send("Ok"));
 app.use("/", apiRoute);
 
-export { app };
+export default app;

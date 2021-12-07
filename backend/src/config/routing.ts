@@ -1,6 +1,6 @@
 import { FirestoreStore } from "@google-cloud/connect-firestore";
 import { CookieOptions, NextFunction, Request, Response, Router } from "express";
-import expressSession from "express-session";
+import expressSession, { MemoryStore } from "express-session";
 
 import { login } from "../auth/auth";
 import { signup } from "../auth/signup";
@@ -13,7 +13,7 @@ import firestore from "./googleFirestore";
 
 const session = expressSession({
     name: "cloudsolver.sid",
-    store: new FirestoreStore({
+    store: env.NODE_ENV === "test" ? new MemoryStore() : new FirestoreStore({
         dataset: firestore(),
         kind: "Session"
     }),
