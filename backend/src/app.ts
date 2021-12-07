@@ -20,10 +20,6 @@ logger.info(`Allows requests from origin ${env.EXPRESS_ALLOW_ORIGIN}`);
 
 app.use(express.json());
 app.get("/", (_, res) => res.send("Ok"));
-app.post('/', async (req, res) => {
-
-    res.sendStatus(201)
-  })
 app.use("/", apiRoute);
 
 export { app };
