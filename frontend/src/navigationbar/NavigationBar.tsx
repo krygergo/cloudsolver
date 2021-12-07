@@ -5,7 +5,7 @@ import { useAuth } from '../auth/AuthContext';
 import { isAdministrator } from '../user/UserUtils';
 
 export default function NavigationBar() {
-  const auth = useAuth();
+  const { user } = useAuth()!;
   return (
     <Navbar>
       <Col>
@@ -18,7 +18,7 @@ export default function NavigationBar() {
         </Navbar.Brand>
       </Col>
       {
-        auth?.user ? <Col><NavigationBarUser/></Col> : <></>
+        user ? <Col><NavigationBarUser/></Col> : <></>
       }
     </Navbar>
   );
