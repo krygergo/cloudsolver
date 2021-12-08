@@ -1,6 +1,23 @@
 #!/usr/bin/env bash
-DOCKERFILE=${1?Error: assign a DOCKERFILE}
-if [[ $MZN != DOCKERFILE ]]; then
-	echo "not in mzn format"
+SOLVERNAME=${1?Error: assign a SOLVERNAME}
+DOCKERFILE=${2?Error: assign a DOCKERFILE}
+TAG=${3}
+if [[ -z "$SOLVERNAME" ]]; then
+	echo "Name required for solver"
 	exit 1
+fi
+if [[ $DOCKERFILE != Dockerfile ]]; then
+	echo "wrong naming convention"
+	exit 1
+fi
+cp $DOCKERFILE context
+if [ -z "$TAG" ];  
+then
+	echo $DOCKERFILE $SOLVERNAME 
+	python3 createYAML.py $SOLVERNAME
+	#tar -C context -zcvf $SOLVERNAME.tar.gz .
+else
+	echo $DOCKERFILE $SOLVERNAME $TAG
+	python3 createYAML.py $SOLVERNAME $TAG
+	#tar -C context -zcvf $SOLVERNAME$TAG.tar.gz .
 fi
