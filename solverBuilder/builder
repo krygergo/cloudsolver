@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+DOCKERFILE=${1?Error: assign a DOCKERFILE}
+if [[ $MZN != DOCKERFILE ]]; then
+	echo "not in mzn format"
+	exit 1
+fi
