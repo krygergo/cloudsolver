@@ -7,8 +7,8 @@ spec:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
     args: ["--dockerfile=./Dockerfile",
-          "--context=gs://cloudsolver-334113.appspot.com/DUMMY.tar.gz",
-          "--no-push"] # replace with your dockerhub account
+          "--context=gs://cloudsolver-334113.appspot.com/IMAGE:TAG.tar.gz",
+          "--destination=europe-docker.pkg.dev/cloudsolver-334113/solverservice/IMAGE:TAG"] # replace with your dockerhub account
     volumeMounts:
     - name: keys
       mountPath: /keys
