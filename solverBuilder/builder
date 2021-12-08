@@ -15,9 +15,9 @@ if [ -z "$TAG" ];
 then
 	echo $DOCKERFILE $SOLVERNAME 
 	python3 createYAML.py $SOLVERNAME
-	#tar -C context -zcvf $SOLVERNAME.tar.gz .
+	tar -C context -zcvf $SOLVERNAME.tar.gz .
 else
 	echo $DOCKERFILE $SOLVERNAME $TAG
 	python3 createYAML.py $SOLVERNAME $TAG
-	#tar -C context -zcvf $SOLVERNAME$TAG.tar.gz .
+	tar -C context -zcvf $SOLVERNAME$TAG.tar.gz .
 fi

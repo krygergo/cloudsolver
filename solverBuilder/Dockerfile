@@ -37,5 +37,3 @@ RUN echo '{"tagDefaults": [["", "org.gecode.gecode"]]}' > $HOME/.minizinc/Prefer
 #Host: cloudsolver-334113.appspot.com
 #Content-length: 0
 #Content-type: application/json
-#Authorization: Bearer ya29.a0ARrdaM_ugf2b_GptCQJidL_GjpymvKS2ocufMgSrg9LIqt2fGLhG__awgnAh4dzpa-jVOFybRrIY_IN9Ho0lxfPvS8z8zuXm17djhKD_LDUf_k1QVx_AC0XeQkmU2-GGcWMK48LgKFrPJTlTlLrqAK5Zh9As
-#Authorization: Bearer ya29.a0ARrdaM_ugf2b_GptCQJidL_GjpymvKS2ocufMgSrg9LIqt2fGLhG__awgnAh4dzpa-jVOFybRrIY_IN9Ho0lxfPvS8z8zuXm17djhKD_LDUf_k1QVx_AC0XeQkmU2-GGcWMK48LgKFrPJTlTlLrqAK5Zh9As
