@@ -20,4 +20,6 @@ const userConverter: FirestoreDataConverter<User> = {
     }
 }
 
+export const isAdmin = (userRight: UserRight) => userRight === "ADMIN";
+
 export default () => firestore().collection("User").withConverter(userConverter);

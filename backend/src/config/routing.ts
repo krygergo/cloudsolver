@@ -8,6 +8,7 @@ import { route as fileRoute } from "../user/file/fileController";
 import { getUserSessionById } from "../session/sessionService";
 import { route as userRoute } from "../user/userController";
 import { route as clusterRoute } from "../cluster/clusterController";
+import { route as adminRoute } from "../admin/adminController";
 import { env } from "./environment";
 import firestore from "./googleFirestore";
 
@@ -58,5 +59,6 @@ route.use(userSession);
 route.use("/user", userRoute);
 route.use("/file", fileRoute);
 route.use("/cluster", clusterRoute);
+route.use("/admin", adminRoute)
 
 export { route };

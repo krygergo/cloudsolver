@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import collection from "./userModel";
+import collection, { isAdmin } from "./userModel";
 
 const createUser = () => collection().doc();
 
@@ -30,3 +30,10 @@ export const getUserByUsername = async (username: string) => {
 export const verifyUserPassword = (password: string, hashedPassword: string) => bcrypt.compare(password, hashedPassword);
 
 export const deleteUserById = (userId: string) => collection().doc(userId).delete();
+
+export const verifyUserAdminRight = async (userId: string) => { 
+    const user = await getUserById(userId);
+    if (!user)
+        return undefined;
+    return isAdmin(user.userRight);
+}
