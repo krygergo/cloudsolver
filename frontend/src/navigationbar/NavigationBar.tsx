@@ -2,7 +2,7 @@ import React from 'react'
 import { Col, Container, Navbar, Image } from 'react-bootstrap'
 import { Link, useHistory } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext';
-import { isAdministrator } from '../user/UserUtils';
+import { isAdmin } from '../user/UserUtils';
 
 export default function NavigationBar() {
   const { user } = useAuth()!;
@@ -40,8 +40,8 @@ function NavigationBarUser() {
   return (
     <Container className="p-0 d-flex flex-column align-items-end">
       <Container className="p-0 d-flex justify-content-end">
-        { isAdministrator(user?.userRight!) ? 
-          <Link to="/administrator">
+        { isAdmin(user?.userRight!) ? 
+          <Link to="/admin">
             <Image src="/administrator_icon.png"/>
           </Link> : <></> 
         }

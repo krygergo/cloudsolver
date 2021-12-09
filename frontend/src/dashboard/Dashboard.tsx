@@ -11,6 +11,9 @@ export default function Dashboard() {
                 <Col className="col-2" >
                     <Files/>
                 </Col>
+                <Col className="col-4">
+                    <FileIO />
+                </Col>
                 <Col>
                 </Col>
             </SelectedFileProvider>
@@ -53,10 +56,11 @@ function Files() {
         <div className="d-flex flex-column">
             <Row className="vh-100">
                 <Col>
-                    <Row style={{ height: "44vh", width: "100%", overflow: "hidden"}} >
+                    <Row style={{ height: "42vh", width: "100%", overflow: "hidden"}} >
                         <MZNFiles files={files.filter((file) => fileType(file.name) === "mzn")} />
                     </Row>
-                    <Row style={{ height: "44vh", width: "100%", overflow: "hidden"}} >
+                    <hr style={{ border: "solid 2px white", visibility: "hidden" }}></hr>
+                    <Row style={{ height: "42vh", width: "100%", overflow: "hidden"}} >
                         <DZNFiles files={files.filter((file) => fileType(file.name) === "dzn")} />
                     </Row>
                     <Row className="d-flex justify-content-center align-items-end">
@@ -74,9 +78,9 @@ function Files() {
 }
 
 function ListFiles({files, select}: {files: UserFile[], select: SelectType}) {
-    
-    const onFileSelect = (file: UserFile) => (_: React.MouseEvent<HTMLButtonElement>) => {
-        
+
+    const onFileSelect = (file: UserFile) => (event: React.MouseEvent<HTMLButtonElement>) => {
+        select.setFile(file);
     }
 
     return (
@@ -84,7 +88,8 @@ function ListFiles({files, select}: {files: UserFile[], select: SelectType}) {
             <ListGroup >
                 {files.map((file, index) => {
                     return (
-                        <ListGroup.Item key={index} action className="bg-transparent mb-1 text-white" onClick={onFileSelect(file)}>
+                        <ListGroup.Item key={index} action 
+                            className={`${file.name === select.file?.name ? "bg-primary" : "bg-transparent"} mb-1 text-white`} onClick={onFileSelect(file)}>
                             {file.name}
                         </ListGroup.Item>
                     );
@@ -112,4 +117,23 @@ function DZNFiles({files}: {files: UserFile[]}) {
     return (
         <ListFiles files={files} select={{ file: dzn, setFile: setDzn}}/>
     );
+}
+
+function FileIO() {
+    return (
+        <div>
+            <Row style={{ height: "80vh" }}>
+                <Form>
+                    <Form.Group className="h-100" controlId="formFileMultiple">
+                        <Form.Control style={{ resize: "none"}} className="bg-transparent text-white h-100" as="textarea">{
+                            
+                        }</Form.Control> 
+                    </Form.Group>
+                </Form>
+            </Row>
+            <Row>
+                TESTE
+            </Row>
+        </div>
+    )
 }
