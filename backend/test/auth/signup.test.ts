@@ -8,11 +8,11 @@ jest.mock("../../src/user/userService", () => ({
 describe("POST /signup", () => {
     it("Returns status code 201 if non existing username is passed", async () => {
         const res = await supertest(app)
-        .post("/signup")
-        .send({
-            username: "username",
-            password: "password"
-        })
+            .post("/signup")
+            .send({
+                username: "username",
+                password: "password"
+            });
         expect(res.statusCode).toBe(201);
     });
 
