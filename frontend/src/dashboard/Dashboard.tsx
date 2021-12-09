@@ -2,23 +2,23 @@ import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Row, Col, ListGroup, Form } from 'react-bootstrap';
 import { fileType, UserFile } from '../user/file/FileModel';
 import {  getFileByNameListen, getFiles, postFile } from '../user/file/fileService';
+import SelectedFileProvider, { SelectType, useSelectedFile } from './SelectedFileContext';
 
 export default function Dashboard() {
     return (
         <div className="d-flex text-white">
-            <Col className="col-2" >
-                <Files/>
-            </Col>
-            <Col>
-            </Col>
+            <SelectedFileProvider>
+                <Col className="col-2" >
+                    <Files/>
+                </Col>
+                <Col>
+                </Col>
+            </SelectedFileProvider>
         </div>
     );
 }
 
 function Files() {
-
-    const [selectedMZN, setSelectedMZN] = useState<UserFile>();
-    const [selectedDZN, setSelectedDZN] = useState<UserFile>();
 
     const [files, setFiles] = useState<UserFile[]>([]);
 
@@ -73,34 +73,43 @@ function Files() {
     );
 }
 
-function MZNFiles({files}: {files: UserFile[]}) {
+function ListFiles({files, select}: {files: UserFile[], select: SelectType}) {
+    
+    const onFileSelect = (file: UserFile) => (_: React.MouseEvent<HTMLButtonElement>) => {
+        
+    }
+
     return (
         <div style={{ width: "100%", height: "100%", overflowY: "scroll", paddingRight: "27px", boxSizing: "content-box" }}>
-        <ListGroup >
-            {files.map((file, index) => {
-                return (
-                    <ListGroup.Item key={index} action className="bg-transparent mb-1 text-white">
-                        {file.name}
-                    </ListGroup.Item>
-                )
-            })}
-        </ListGroup>
+            <ListGroup >
+                {files.map((file, index) => {
+                    return (
+                        <ListGroup.Item key={index} action className="bg-transparent mb-1 text-white" onClick={onFileSelect(file)}>
+                            {file.name}
+                        </ListGroup.Item>
+                    );
+                })}
+            </ListGroup>
         </div>
     );
 }
 
-function DZNFiles({files}: {files: UserFile[]}) {
+function MZNFiles({files}: {files: UserFile[]}) {
+    const selectedFile = useSelectedFile();
+    if(!selectedFile)
+        return <></>;
+    const {mzn, setMzn} = selectedFile;
     return (
-        <div style={{ width: "100%", height: "100%", overflowY: "scroll", paddingRight: "27px", boxSizing: "content-box" }}>
-        <ListGroup>
-            {files.map((file, index) => {
-                return (
-                    <ListGroup.Item key={index} action className="bg-transparent mb-1 text-white">
-                        {file.name}
-                    </ListGroup.Item>
-                )
-            })}
-        </ListGroup>
-        </div>
+        <ListFiles files={files} select={{ file: mzn, setFile: setMzn }}/>
+    );
+}
+
+function DZNFiles({files}: {files: UserFile[]}) {
+    const selectedFile = useSelectedFile();
+    if(!selectedFile)
+        return <></>;
+    const {dzn, setDzn} = selectedFile;
+    return (
+        <ListFiles files={files} select={{ file: dzn, setFile: setDzn}}/>
     );
 }

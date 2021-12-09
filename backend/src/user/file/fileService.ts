@@ -2,7 +2,7 @@ import { FileType, getFileType } from "./fileModel";
 import collection from "./fileModel";
 import { UploadedFile } from "express-fileupload";
 import { createFileBinary, updateOrDeleteFileBinary } from "./binary/fileBinaryService";
-import googleFirestore from "../../config/googleFirestore";
+import googleFirestore from "../../config/database/googleFirestore";
 import { Response } from "express";
 
 const firestore = googleFirestore();

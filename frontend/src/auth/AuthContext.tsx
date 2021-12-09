@@ -5,14 +5,14 @@ import { env } from '../config/environment';
 import { User } from '../user/UserModel';
 import { getUser, loginUser, signupUser } from '../user/UserService';
 
-type Auth = {
-    user: User | undefined
+interface Auth {
+    user?: User
     login: (username: string, password: string) => Promise<void>
     signup: (username: string, password: string) => Promise<void>
     logout: () => Promise<void>
-} | undefined;
+};
 
-const AuthContext = createContext<Auth>(undefined);
+const AuthContext = createContext<Auth | undefined>(undefined);
 
 export function useAuth() {
     return useContext(AuthContext);

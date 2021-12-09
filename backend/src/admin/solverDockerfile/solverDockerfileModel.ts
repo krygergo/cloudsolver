@@ -1,7 +1,6 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 import { UploadedFile } from "express-fileupload";
-import firestore from "../../config/googleFirestore";
-
+import firestore from "../../config/database/googleFirestore";
 
 export interface SolverDockerfile extends Omit<UploadedFile, "mv"> {
     id: string

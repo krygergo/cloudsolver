@@ -5,5 +5,4 @@ docker-compose.yml
 Dockerfile.development
 Dockerfile.firestore
 Dockerfile.production
-build
 test

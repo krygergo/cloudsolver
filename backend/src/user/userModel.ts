@@ -1,7 +1,7 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import firestore from "../config/googleFirestore";
+import firestore from "../config/database/googleFirestore";
 
-type UserRight = "ADMIN" | "DEFAULT"
+export type UserRight = "ADMIN" | "DEFAULT"
 
 export interface User {
     id: string

@@ -1,17 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
-import fileUpload, { UploadedFile, Options } from "express-fileupload";
+import fileUpload from "express-fileupload";
 import { getFileType } from "./fileModel";
 import { addFile, deleteFile, getAllFiles, getFileByName, sendFileByNameListen, updateFileData, updateFileName } from "./fileService";
 import { getFileBinaryById } from "./binary/fileBinaryService";
-
-const MAX_FILE_SIZE_IN_BYTES = 1_000_000
-
-const defaultFileUploadConfig: Options = {
-    limits: {
-        fileSize: MAX_FILE_SIZE_IN_BYTES
-    },
-    abortOnLimit: true
-}
+import { asSingleFile, defaultFileUploadConfig } from "../../config/fileConfig";
 
 const route = Router();
 
@@ -89,9 +81,6 @@ route.delete("/:filedId", async (req, res) => {
     }
     res.sendStatus(200);
 })
-
-const asSingleFile = (upload: UploadedFile | UploadedFile[]) => 
-    Array.isArray(upload) ? undefined : upload as UploadedFile;
 
 const isMinizincFile = (name: string) =>  {
     const fileType = getFileType(name);

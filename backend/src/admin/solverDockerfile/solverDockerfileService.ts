@@ -1,8 +1,5 @@
 import { UploadedFile } from "express-fileupload";
-import { isAdmin } from "../../user/userModel"
 import collection from "./solverDockerfileModel"
-import firestore from "../../config/googleFirestore";
-
 
 const createSolverDockerfile = () => collection().doc();
 

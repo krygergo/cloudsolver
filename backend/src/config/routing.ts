@@ -10,7 +10,7 @@ import { route as userRoute } from "../user/userController";
 import { route as clusterRoute } from "../cluster/clusterController";
 import { route as adminRoute } from "../admin/adminController";
 import { env } from "./environment";
-import firestore from "./googleFirestore";
+import firestore from "./database/googleFirestore";
 
 const session = expressSession({
     name: "cloudsolver.sid",
