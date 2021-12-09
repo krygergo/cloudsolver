@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import fileUpload, { UploadedFile, Options } from "express-fileupload";
 import { getFileType } from "./fileModel";
-import { addFile, deleteFile, getAllFiles, updateFileData, updateFileName } from "./fileService";
+import { addFile, deleteFile, getAllFiles, getFileByName, sendFileByNameListen, updateFileData, updateFileName } from "./fileService";
 import { getFileBinaryById } from "./binary/fileBinaryService";
 
 const MAX_FILE_SIZE_IN_BYTES = 1_000_000
@@ -41,6 +41,15 @@ route.get("/", async (req, res) => {
     const files = await getAllFiles(req.session.userId!);
     res.send(files);
 });
+
+route.get("/:name/name", async (req, res) => {
+    const file = await getFileByName(req.session.userId!, req.params.name);
+    res.send(file);
+})
+
+route.get("/:name/name/listen", async (req, res) => sendFileByNameListen(
+    req.session.userId!, req.params.name, res as Response
+));
 
 route.get("/:fileBinaryId/binary", async (req, res) => {
     const fileBinary = await getFileBinaryById(req.session.userId!, req.params.fileBinaryId);

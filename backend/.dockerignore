@@ -1,7 +1,9 @@
 **/node_modules
 .gitignore
 .idea
-docker-compose.dev.yml
+docker-compose.yml
 Dockerfile.development
 Dockerfile.firestore
 Dockerfile.production
+build
+test

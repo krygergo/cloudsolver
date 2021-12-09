@@ -24,7 +24,7 @@ export default function Signup() {
     }
 
     return (
-        <Container className="d-flex flex-column-reverse">
+        <div className="d-flex flex-column-reverse">
             <Row className="w-100 text-center mb-2">
                 <Link to="/login" style={{
                     textDecoration: "none"
@@ -33,7 +33,7 @@ export default function Signup() {
                 </Link>
             </Row>
             <Row className="flex-grow-1">
-                <Container className="h-100 d-flex align-items-center justify-content-center">
+                <div className="h-100 d-flex align-items-center justify-content-center">
                     <Form onSubmit={signupSubmit}>
                         <Form.Group id="username">
                             <Form.Control type="text" placeholder="username" ref={usernameRef} required />
@@ -48,8 +48,8 @@ export default function Signup() {
                             Sign Up
                         </Button>
                     </Form>
-                </Container>
+                </div>
             </Row>
-        </Container>
+        </div>
     );
 }
