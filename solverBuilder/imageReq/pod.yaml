@@ -7,8 +7,8 @@ spec:
   - name: kaniko
     image: gcr.io/kaniko-project/executor:latest
     args: ["--dockerfile=./Dockerfile",
-          "--context=gs://cloudsolver-334113.appspot.com/test:latest.tar.gz",
-          "--destination=europe-docker.pkg.dev/cloudsolver-334113/solverservice/test:latest"] # replace with your dockerhub account
+          "--context=gs://cloudsolver-334113.appspot.com/solvers/gecode_latest.tar.gz",
+          "--destination=europe-docker.pkg.dev/cloudsolver-334113/solverservice/gecode_latest"] # replace with your dockerhub account
     volumeMounts:
     - name: keys
       mountPath: /keys

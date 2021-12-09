@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: builderpodbuilder
+spec:
+  containers:
+  - name: builderpodbuilder
+    image: gcr.io/europe-docker.pkg.dev/cloudsolver-334113/solverservice/builderpodbuilder:latest
+    volumeMounts:
+    - name: keys
+      mountPath: /keys
+      readOnly: true
+  restartPolicy: Never
+  volumes:
+    - name: keys
+      secret:
+        secretName: google-api-key
