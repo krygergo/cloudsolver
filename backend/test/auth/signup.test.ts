@@ -1,7 +1,5 @@
-import { Cookie } from "express-session";
 import supertest from "supertest"
 import app from "../../src/app";
-import { getUserByUsername } from "../../src/user/userService";
 
 
 jest.mock("../../src/user/userService", () => ({
