@@ -1,5 +1,5 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import firestore from "../../../config/googleFirestore";
+import firestore from "../../../config/database/googleFirestore";
 
 export interface FileBinary {
     id: string

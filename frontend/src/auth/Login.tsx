@@ -1,5 +1,5 @@
 import React, { FormEvent, useRef } from 'react'
-import { Button, Form, Container, Row } from 'react-bootstrap';
+import { Button, Form, Row } from 'react-bootstrap';
 import { Link, Redirect, useHistory } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 
@@ -24,7 +24,7 @@ export default function Login() {
     }
 
     return (
-        <Container className="d-flex flex-column-reverse">
+        <div className="d-flex flex-column-reverse">
             <Row className="w-100 text-center mb-2">
                 <Link to="/signup" style={{
                     textDecoration: "none"
@@ -33,7 +33,7 @@ export default function Login() {
                 </Link>
             </Row>
             <Row className="flex-grow-1">
-                <Container className="h-100 d-flex align-items-center justify-content-center">
+                <div className="h-100 d-flex align-items-center justify-content-center">
                     <Form onSubmit={loginSubmit}>
                         <Form.Group id="username">
                             <Form.Control type="text" placeholder="username" ref={usernameRef} required />
@@ -45,8 +45,8 @@ export default function Login() {
                             Log In
                         </Button>
                     </Form>
-                </Container>
+                </div>
             </Row>
-        </Container>
+        </div>
     );
 }

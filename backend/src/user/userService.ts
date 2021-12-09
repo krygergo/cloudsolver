@@ -1,9 +1,9 @@
 import bcrypt from "bcrypt";
-import collection from "./userModel";
+import collection, { isAdmin, UserRight } from "./userModel";
 
 const createUser = () => collection().doc();
 
-export async function addUser(username: string, password: string) {
+export async function addUser(username: string, password: string, userRight: UserRight = "DEFAULT") {
     const userSnapshot = await collection().where("username", "==", username).get();
     if(!userSnapshot.empty)
         return undefined;
@@ -12,7 +12,7 @@ export async function addUser(username: string, password: string) {
         id: user.id,
         username: username,
         hashedPassword: await bcrypt.hash(password, 10),
-        userRight: "DEFAULT",
+        userRight: userRight,
         createdAt: Date.now()
     });
     return user.id;
@@ -30,3 +30,10 @@ export const getUserByUsername = async (username: string) => {
 export const verifyUserPassword = (password: string, hashedPassword: string) => bcrypt.compare(password, hashedPassword);
 
 export const deleteUserById = (userId: string) => collection().doc(userId).delete();
+
+export const verifyUserAdminRight = async (userId: string) => { 
+    const user = await getUserById(userId);
+    if (!user)
+        return undefined;
+    return isAdmin(user.userRight);
+}

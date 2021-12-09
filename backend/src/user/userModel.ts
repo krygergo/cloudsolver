@@ -1,7 +1,7 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import firestore from "../config/googleFirestore";
+import firestore from "../config/database/googleFirestore";
 
-type UserRight = "ADMIN" | "DEFAULT"
+export type UserRight = "ADMIN" | "DEFAULT"
 
 export interface User {
     id: string
@@ -19,5 +19,7 @@ const userConverter: FirestoreDataConverter<User> = {
         return snapshot.data() as User;
     }
 }
+
+export const isAdmin = (userRight: UserRight) => userRight === "ADMIN";
 
 export default () => firestore().collection("User").withConverter(userConverter);

@@ -10,7 +10,7 @@ export default function UserRoute() {
         <>
             <Route exact path="/" component={Dashboard}/>
             <Route path="/settings" component={Settings}/>
-            <AdminRoute path="/administrator" component={Administrator}/>
+            <AdminRoute path="/admin" component={Administrator}/>
         </>
     );
 }

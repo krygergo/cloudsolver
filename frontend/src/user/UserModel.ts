@@ -4,7 +4,4 @@ export interface User {
     createdAt: number
 }
 
-export enum UserRights {
-    ADMIN,
-    DEFAULT
-}
+export type UserRights = "DEFAULT" | "ADMIN"

@@ -11,12 +11,13 @@ function App() {
   return (
     <BrowserRouter>
       <Container fluid className="vh-100 d-flex flex-column" style={{
-        backgroundImage: "linear-gradient(rgba(4,9,30,0.75),rgba(4,9,30,0.75)),url(/cloud_background.jpg)"
+        backgroundImage: "linear-gradient(rgba(4,9,30,0.75),rgba(4,9,30,0.75)),url(/cloud_background.jpg)",
+        overflow: "hidden"
       }}>
           <Row>
             <NavigationBar/>
           </Row>
-          <Row className="flex-grow-1">
+          <Row className="vh-100">
             <Switch>
               <Route path="/login" component={Login} />
               <Route path="/signup" component={Signup} />

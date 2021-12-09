@@ -2,7 +2,8 @@ import { FileType, getFileType } from "./fileModel";
 import collection from "./fileModel";
 import { UploadedFile } from "express-fileupload";
 import { createFileBinary, updateOrDeleteFileBinary } from "./binary/fileBinaryService";
-import googleFirestore from "../../config/googleFirestore";
+import googleFirestore from "../../config/database/googleFirestore";
+import { Response } from "express";
 
 const firestore = googleFirestore();
 
@@ -76,4 +77,13 @@ export const getFileByType = async (userId: string, type: FileType) => {
     if(!fileSnapshot.empty)
         return undefined;
     return fileSnapshot.docs.map((snapshot) => snapshot.data());
+}
+
+export const sendFileByNameListen = async (userId: string, name: string, res: Response) => {
+    const unsub = collection(userId).where("name", "==", name).onSnapshot((snapshot) => {
+        if(!snapshot.empty) {
+            res.send(snapshot.docs[0].data());
+            unsub();
+        }
+    },(error) => res.status(500).send("Error listening on file"));
 }
