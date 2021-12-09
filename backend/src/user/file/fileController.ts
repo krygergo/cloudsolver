@@ -1,11 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
 import fileUpload from "express-fileupload";
 import { getFileType } from "./fileModel";
-import { addFile, deleteFile, getAllFiles, getFileByName, sendFileByNameListen, updateFileData, updateFileName } from "./fileService";
-import { getFileBinaryById } from "./binary/fileBinaryService";
+import fileService from "./fileService";
+import fileBinaryService from "./binary/fileBinaryService";
 import { asSingleFile, defaultFileUploadConfig } from "../../config/fileConfig";
-
-const route = Router();
 
 const verifyMinizincFile = (req: Request, res: Response, next: NextFunction) => {
     if(!req.files)
@@ -21,70 +19,62 @@ const verifyMinizincFile = (req: Request, res: Response, next: NextFunction) => 
     next();
 }
 
-route.post("/", fileUpload(defaultFileUploadConfig), verifyMinizincFile, async (req, res) => {
-    const file = res.locals.file!;
-    const write = await addFile(req.session.userId!, file);
-    if(!write)
-        return res.status(403).send("File allready exists");
-    res.status(201).send(`Successfully uploaded ${file.name}`);
-});
-
-route.get("/", async (req, res) => {
-    const files = await getAllFiles(req.session.userId!);
-    res.send(files);
-});
-
-route.get("/:name/name", async (req, res) => {
-    const file = await getFileByName(req.session.userId!, req.params.name);
-    res.send(file);
-})
-
-route.get("/:name/name/listen", async (req, res) => sendFileByNameListen(
-    req.session.userId!, req.params.name, res as Response
-));
-
-route.get("/:fileBinaryId/binary", async (req, res) => {
-    const fileBinary = await getFileBinaryById(req.session.userId!, req.params.fileBinaryId);
-    if(!fileBinary)
-        return res.status(400).send("Not found");
-    res.send(fileBinary);
-});
-
-route.put("/:fileId/data", fileUpload(defaultFileUploadConfig), verifyMinizincFile, async (req, res) => {
-    try {
-        const update = await updateFileData(req.session.userId!, req.params.fileId, res.locals.file!);
-        if(!update)
-            return res.status(400).send("Failed to update name");
-    } catch(error) {
-        console.log(error);
-        return res.sendStatus(500);
-    }
-    res.sendStatus(200);
-});
-
-route.put("/:fileId/name", async (req, res) => {
-    if(!req.body.name)
-        return res.status(400).send("No name value specified");
-    try {
-        await updateFileName(req.session.userId!, req.params.fileId, req.body.name);
-    } catch(error) {
-        return res.sendStatus(500);
-    }
-    res.sendStatus(200);
-});
-
-route.delete("/:filedId", async (req, res) => {
-    try {
-        await deleteFile(req.session.userId!, req.params.filedId);
-    } catch(error) {
-        return res.sendStatus(500);
-    }
-    res.sendStatus(200);
-})
-
 const isMinizincFile = (name: string) =>  {
     const fileType = getFileType(name);
     return fileType === "mzn" || fileType === "dzn";
 }
 
-export { route }
+export default (req: Request, res: Response, next: NextFunction) => {
+    const fileSvc = fileService(req.session.userId!);
+    const fileBinarySvc = fileBinaryService(req.session.userId!);
+    
+    const route = Router();
+
+    route.post("/", fileUpload(defaultFileUploadConfig), verifyMinizincFile, async (_, res) => {
+        const file = res.locals.file!;
+        const write = await fileSvc.addFile(file);
+        if(!write)
+            return res.status(403).send("File allready exists");
+        res.status(201).send(`Successfully uploaded ${file.name}`);
+    });
+
+    route.get("/", async (_, res) => res.send(await fileSvc.getAllFiles()));
+
+    route.get("/name/:name", async (req, res) => {
+        const file = await fileSvc.fileByName(req.params.name).get();
+        if(!file)
+            return res.status(400).send("File do not exists");
+        return res.send(file);
+    })
+
+    route.get("/name/listen/:name", (req, res) => fileSvc.fileByName(req.params.name).listenOnChange(res as Response));
+
+    route.get("/binary/:fileBinaryId", async (req, res) => {
+        const fileBinary = await fileBinarySvc.getFileBinaryById(req.params.fileBinaryId);
+        if(!fileBinary)
+            return res.status(400).send("Not found");
+        res.send(fileBinary);
+    });
+
+    route.put("/binary/:fileId", fileUpload(defaultFileUploadConfig), verifyMinizincFile, async (req, res) => {
+        if(!await fileSvc.fileById(req.params.fileId).updateFileData(res.locals.file!))
+            return res.status(400).send("File do not exists");
+        res.sendStatus(200);        
+    });
+
+    route.put("/name/:fileId", async (req, res) =>{
+        if(!req.query.name)
+            return res.status(400).send("No query parameter name specified");
+        if(!await fileSvc.fileById(req.params.fileId).updateFileName(req.query.name as string))
+            return res.status(400).send("File do not exists");
+        res.sendStatus(200);
+    });
+
+    route.delete("/:filedId", async (req, res) => {
+        if(!await fileSvc.fileById(req.params.filedId).deleteFile())
+            return res.status(400).send("Unable to delete");
+        res.sendStatus(200);
+    })
+
+    return route(req, res, next);
+}

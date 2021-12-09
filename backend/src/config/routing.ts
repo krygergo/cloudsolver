@@ -4,11 +4,11 @@ import expressSession, { MemoryStore } from "express-session";
 
 import { login } from "../auth/auth";
 import { signup } from "../auth/signup";
-import { route as fileRoute } from "../user/file/fileController";
+import fileRoute from "../user/file/fileController";
 import { getUserSessionById } from "../session/sessionService";
-import { route as userRoute } from "../user/userController";
-import { route as clusterRoute } from "../cluster/clusterController";
-import { route as adminRoute } from "../admin/adminController";
+import userRoute from "../user/userController";
+import clusterRoute from "../cluster/clusterController";
+import adminRoute from "../admin/adminController";
 import { env } from "./environment";
 import firestore from "./database/googleFirestore";
 

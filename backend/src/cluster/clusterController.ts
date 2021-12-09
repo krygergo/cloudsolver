@@ -8,4 +8,4 @@ route.get("/nodes", async (req, res) => {
     res.send(quantity);
 });
 
-export { route }
+export default route;

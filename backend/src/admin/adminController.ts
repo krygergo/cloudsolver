@@ -4,13 +4,13 @@ import fileUpload from "express-fileupload";
 import { addSolverDockerfile, getAllSolverDockerfiles } from "./solverDockerfile/solverDockerfileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
 
+const route = Router();
+
 const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
     if (!await verifyUserAdminRight(req.session.userId!))
         return res.status(403).send("User does not exist or user is not admin.");
     next();
 }
-
-const route = Router();
 
 route.use(verifyAdmin);
 
@@ -28,6 +28,6 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     res.status(201).send("Successfully uploaded the solver Dockerfile");
 });
 
-export { route };
+export default route;
 
 
