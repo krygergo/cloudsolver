@@ -1,18 +1,18 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 import { UploadedFile } from "express-fileupload";
-import firestore from "../../config/database/googleFirestore";
+import firestore from "../../../config/database/googleFirestore";
 
-export interface SolverDockerfile extends Omit<UploadedFile, "mv"> {
+export interface SolverFile extends Omit<UploadedFile, "mv"> {
     id: string
     createdAt: number
 }
 
-const solverDockerfileConverter: FirestoreDataConverter<SolverDockerfile> = {
-    toFirestore(file: SolverDockerfile) {
+const solverDockerfileConverter: FirestoreDataConverter<SolverFile> = {
+    toFirestore(file: SolverFile) {
         return file;
     },
     fromFirestore(snapshot: QueryDocumentSnapshot) {
-        return snapshot.data() as SolverDockerfile;
+        return snapshot.data() as SolverFile;
     }
 }
 

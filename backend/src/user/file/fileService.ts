@@ -1,6 +1,5 @@
-import { FileType, getFileType } from "./fileModel";
 import fileCollection from "./fileModel";
-import fileUpload, { UploadedFile } from "express-fileupload";
+import { UploadedFile } from "express-fileupload";
 import fileBinaryService from "./binary/fileBinaryService";
 import googleFirestore from "../../config/database/googleFirestore";
 import { Response } from "express";

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { verifyUserAdminRight } from "../user/userService";
 import fileUpload from "express-fileupload";
-import { addSolverDockerfile, getAllSolverDockerfiles } from "./solverDockerfile/solverDockerfileService";
+import { addSolverFile, getAllSolverFiles } from "./solver/file/solverFileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
 
 const route = Router();
@@ -14,17 +14,17 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
 route.use(verifyAdmin);
 
-route.get("/solver", async (_, res) => res.send(await getAllSolverDockerfiles()));
+route.get("/solver", async (_, res) => res.send(await getAllSolverFiles()));
 
 route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     if(!req.files)
         return res.status(403).send("File not found!");
-    if(!req.files.solverDockerfile)
+    if(!req.files.solverfile)
         return res.status(403).send("Wrong type of file!");
-    const file = asSingleFile(req.files.solverDockerfile)
+    const file = asSingleFile(req.files.solverfile)
     if (!file)
         return res.status(403).send("You can only upload one file at once.");
-    addSolverDockerfile(file);
+    addSolverFile(file);
     res.status(201).send("Successfully uploaded the solver Dockerfile");
 });
 

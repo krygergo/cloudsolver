@@ -1,13 +1,13 @@
 import { UploadedFile } from "express-fileupload";
-import collection from "./solverDockerfileModel"
+import collection from "./solverFileModel"
 
-const createSolverDockerfile = () => collection().doc();
+const createSolverFile = () => collection().doc();
 
-export const addSolverDockerfile = async (fileUpload: UploadedFile) => {
+export const addSolverFile = async (fileUpload: UploadedFile) => {
     const fileSnapshot = await collection().where("name", "==", fileUpload.name).get();
     if(!fileSnapshot.empty)
         return undefined;
-    const doc = createSolverDockerfile();
+    const doc = createSolverFile();
     collection().add({
         id: doc.id,
         createdAt: Date.now(),
@@ -16,4 +16,4 @@ export const addSolverDockerfile = async (fileUpload: UploadedFile) => {
     return doc.id
 }
 
-export const getAllSolverDockerfiles = async () => (await collection().get()).docs.map((snapshot) => snapshot.data());
+export const getAllSolverFiles = async () => (await collection().get()).docs.map((snapshot) => snapshot.data());
