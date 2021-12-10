@@ -11,7 +11,7 @@ const kanikoPod = (solvername: string): V1Pod => ({
     apiVersion: "v1",
     kind: "Pod",
     metadata: {
-        name: "kaniko"
+        name: `kaniko-${solvername}`
     },
     spec: {
         containers: [{ 
