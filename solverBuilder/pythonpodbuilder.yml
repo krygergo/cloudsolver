@@ -10,6 +10,9 @@ spec:
     - name: keys
       mountPath: /keys
       readOnly: true
+    env:
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        value: "/keys/google-api-key.json"
   restartPolicy: Never
   volumes:
     - name: keys

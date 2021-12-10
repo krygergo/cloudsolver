@@ -15,4 +15,4 @@ else
 	python3 createYAML.py $SOLVERNAME $TAG
 	#tar -C context -zcf $SOLVERNAME$TAG.tar.gz .
 fi
-kubectl create -f pod.yaml
+kubectl apply -f pod.yaml

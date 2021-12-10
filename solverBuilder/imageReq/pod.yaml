@@ -5,14 +5,17 @@ metadata:
 spec:
   containers:
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
+    image: gcr.io/kaniko-project/executor:edge
     args: ["--dockerfile=./Dockerfile",
           "--context=gs://cloudsolver-334113.appspot.com/solvers/gecode_latest.tar.gz",
-          "--destination=europe-docker.pkg.dev/cloudsolver-334113/solverservice/gecode_latest"] # replace with your dockerhub account
+          "--destination=gcr.io/cloudsolver-334113/solverservice/gecode:tag1"] # replace with your dockerhub account
     volumeMounts:
     - name: keys
       mountPath: /keys
       readOnly: true
+    env:
+      - name: GOOGLE_APPLICATION_CREDENTIALS
+        value: "/keys/google-api-key.json"
   restartPolicy: Never
   volumes:
     - name: keys
