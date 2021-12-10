@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { verifyUserAdminRight } from "../user/userService";
 import fileUpload from "express-fileupload";
-import { addSolverFile, getAllSolverFiles } from "./solver/file/solverFileService";
+import { addSolverFile } from "./solver/file/solverFileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
 
 const route = Router();
@@ -14,18 +14,21 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
 route.use(verifyAdmin);
 
-route.get("/solver", async (_, res) => res.send(await getAllSolverFiles()));
-
 route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     if(!req.files)
-        return res.status(403).send("File not found!");
+        return res.status(404).send("File not found!");
     if(!req.files.solverfile)
-        return res.status(403).send("Wrong type of file!");
-    const file = asSingleFile(req.files.solverfile)
-    if (!file)
-        return res.status(403).send("You can only upload one file at once.");
-    addSolverFile(file);
-    res.status(201).send("Successfully uploaded the solver Dockerfile");
+        return res.status(400).send("Wrong type of file!");
+    const file = asSingleFile(req.files.solverfile);
+    if(!file)
+        return res.status(400).send("You can only upload one file at once.");
+    if(file.name.length <= ".tar.gz".length)
+        return res.status(400).send("The solver must have a name!");
+    if(file.name.slice(file.name.length-".tar.gz".length) !== ".tar.gz")
+        return res.status(415).send("The file extension must be .tar.gz.");
+    if(!await addSolverFile(file))
+        return res.status(400).send("The file already exists or an unexpected error occured.");
+    return res.status(201).send("Successfully uploaded the solver Dockerfile.");
 });
 
 export default route;

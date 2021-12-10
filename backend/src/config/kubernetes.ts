@@ -1,7 +1,8 @@
-import { KubeConfig } from "@kubernetes/client-node";
+import { KubeConfig, CoreV1Api } from "@kubernetes/client-node";
 
 const config = new KubeConfig();
+config.loadFromDefault();
 
-config.loadFromCluster();
+const api = config.makeApiClient(CoreV1Api);
 
-export default () => config;
+export default () => ({ config, api });
