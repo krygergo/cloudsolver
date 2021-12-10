@@ -79,7 +79,9 @@ function Files() {
 
 function ListFiles({files, select}: {files: UserFile[], select: SelectType}) {
 
-    const onFileSelect = (file: UserFile) => (event: React.MouseEvent<HTMLButtonElement>) => {
+    const onFileSelect = (file: UserFile) => (_: React.MouseEvent<HTMLButtonElement>) => {
+        if(select.file?.name === file.name)
+            return select.setFile(undefined);
         select.setFile(file);
     }
 
@@ -120,19 +122,39 @@ function DZNFiles({files}: {files: UserFile[]}) {
 }
 
 function FileIO() {
+    const selectedFile = useSelectedFile();
     return (
         <div>
-            <Row style={{ height: "80vh" }}>
-                <Form>
-                    <Form.Group className="h-100" controlId="formFileMultiple">
-                        <Form.Control style={{ resize: "none"}} className="bg-transparent text-white h-100" as="textarea">{
-                            
-                        }</Form.Control> 
-                    </Form.Group>
-                </Form>
-            </Row>
             <Row>
-                TESTE
+                Clicked MZN
+                <div>
+                    id: {selectedFile?.mzn?.id};
+                </div>
+                <div>
+                    name: {selectedFile?.mzn?.name};
+                </div>
+                <div>    
+                    createdAt: {selectedFile?.mzn?.createdAt};
+                </div>
+                <div>    
+                    binaryId: {selectedFile?.mzn?.fileBinaryId};  
+                </div>
+            </Row>
+            <hr />
+            <Row>
+                Clicked DZN
+                <div>
+                    id: {selectedFile?.dzn?.id};
+                </div>
+                <div>
+                    name: {selectedFile?.dzn?.name};
+                </div>
+                <div>    
+                    createdAt: {selectedFile?.dzn?.createdAt};
+                </div>
+                <div>    
+                    binaryId: {selectedFile?.dzn?.fileBinaryId};  
+                </div>
             </Row>
         </div>
     )
