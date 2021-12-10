@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { UserFile } from "../user/file/FileModel";
 
-type SetFile = React.Dispatch<React.SetStateAction<UserFile | undefined>>;
+export type SetFile = React.Dispatch<React.SetStateAction<UserFile | undefined>>;
 
 interface SelectedFile {
     mzn?: UserFile,
