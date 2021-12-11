@@ -1,0 +1,3 @@
+#!/bin/bash
+
+kubectl logs -f "$(kubectl get pods | cut -d " " -f 1 | sed -n 2p)"
