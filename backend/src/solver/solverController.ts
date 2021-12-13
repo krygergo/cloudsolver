@@ -12,4 +12,8 @@ route.get("/", async (_, res) => {
     res.send(({ images: images }));
 })
 
+route.post("/", (req, res) => {
+    
+});
+
 export default route;
