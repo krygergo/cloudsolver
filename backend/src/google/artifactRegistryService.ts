@@ -1,11 +1,11 @@
-import googleRegistry from "../config/googleArtifactRegistry"
+import googleArtifactRegistry from "../config/googleArtifactRegistry"
 
 export const ArtifactRegistryService = (location: string, repository: string) => {
-    const registry = googleRegistry();
-    const repositoryPath = registry.repositoryPath("cloudsolver-334113", location, repository);
+    const artifactRegistry = googleArtifactRegistry();
+    const repositoryPath = artifactRegistry.repositoryPath("cloudsolver-334113", location, repository);
 
     const getAllImages = async () => {
-        const [images] = await registry.listPackages({
+        const [images] = await artifactRegistry.listPackages({
             parent: repositoryPath
         });
         if(images.length == 0)
