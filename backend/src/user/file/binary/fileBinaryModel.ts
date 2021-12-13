@@ -15,7 +15,7 @@ const fileDataConverter: FirestoreDataConverter<FileBinary> = {
     }
 }
 
-export default (userId: string) => firestore()
+export const FileBinaryCollection = (userId: string) => firestore()
     .collection("User")
     .doc(userId)
     .collection("FileBinary")

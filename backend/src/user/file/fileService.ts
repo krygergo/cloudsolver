@@ -1,26 +1,26 @@
-import fileCollection from "./fileModel";
+import { FileCollection } from "./fileModel";
 import { UploadedFile } from "express-fileupload";
-import fileBinaryService from "./binary/fileBinaryService";
+import { FileBinaryService } from "./binary/fileBinaryService";
 import googleFirestore from "../../config/database/googleFirestore";
 import { Response } from "express";
 
 const firestore = googleFirestore();
 
-export default (userId: string) => {
-    const fileBinarySvc = fileBinaryService(userId);
-    const fileCol = fileCollection(userId);
+export const FileService = (userId: string) => {
+    const fileBinaryService = FileBinaryService(userId);
+    const fileCollection = FileCollection(userId);
 
     const addFile = async (uploadedFile: UploadedFile) => {
-        const fileSnapshot = await fileCol.where("name", "==", uploadedFile.name).get();
+        const fileSnapshot = await fileCollection.where("name", "==", uploadedFile.name).get();
         if(!fileSnapshot.empty)
             return undefined;
         const batch = firestore.batch();
-        const fileBinaryDoc = fileBinarySvc.createFileBinaryDoc();
+        const fileBinaryDoc = fileBinaryService.createFileBinaryDoc();
         batch.set(fileBinaryDoc, {
             id: fileBinaryDoc.id,
             binary: uploadedFile.data
         });
-        const fileDoc = fileCol.doc();
+        const fileDoc = fileCollection.doc();
         const timeStamp = Date.now();
         batch.set(fileDoc, {
             id: fileDoc.id,
@@ -33,7 +33,7 @@ export default (userId: string) => {
     }
 
     const fileById = (fileId: string) => {
-        const document = fileCol.doc(fileId);
+        const document = fileCollection.doc(fileId);
 
         const getFile = async () => {
             const fileSnapshot = await document.get();
@@ -47,7 +47,7 @@ export default (userId: string) => {
             const file = await getFile();
             if(!file)
                 return undefined;
-            batch.update(fileBinarySvc.getFileBinaryDoc(file.fileBinaryId), {
+            batch.update(fileBinaryService.getFileBinaryDoc(file.fileBinaryId), {
                 binary: uploadedFile.data
             });
             batch.update(document, {
@@ -67,7 +67,7 @@ export default (userId: string) => {
             if(!file)
                 return undefined;
             const batch = firestore.batch();
-            batch.delete(fileBinarySvc.getFileBinaryDoc(file.fileBinaryId));
+            batch.delete(fileBinaryService.getFileBinaryDoc(file.fileBinaryId));
             batch.delete(document);
             return batch.commit();
         }
@@ -81,7 +81,7 @@ export default (userId: string) => {
     }
 
     const fileByName = (name: string) => {
-        const query = fileCol.where("name", "==", name);
+        const query = fileCollection.where("name", "==", name);
         
         const getFile = async () => {
             const fileSnapshot = await query.get();
@@ -106,7 +106,7 @@ export default (userId: string) => {
     }
 
     const getAllFiles = async () => {
-        const fileSnapshot = await fileCol.get();
+        const fileSnapshot = await fileCollection.get();
         return fileSnapshot.docs.map((doc) => doc.data());
     }
 

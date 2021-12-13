@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/artifact-registry": "^1.2.1",
     "@google-cloud/connect-firestore": "^2.0.2",
     "@google-cloud/container": "^2.5.0",
     "@google-cloud/firestore": "^4.15.1",

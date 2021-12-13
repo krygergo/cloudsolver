@@ -1,11 +1,10 @@
 import { UploadedFile } from "express-fileupload";
 import storage from "../../../config/googleStorage"
-import stream from "stream"
+import { PassThrough } from "stream"
 import k8s from "../../../config/kubernetes"
 import { V1Pod } from "@kubernetes/client-node";
 
 const bucket = storage().bucket("cloudsolver-334113.appspot.com");
-
 
 const kanikoPod = (solvername: string): V1Pod => ({
     apiVersion: "v1",
@@ -50,7 +49,7 @@ export const addSolverFile = async (fileUpload: UploadedFile) => {
     if (fileExists)
         return false;
 
-    const passthroughStream = new stream.PassThrough();
+    const passthroughStream = new PassThrough();
     passthroughStream.write(fileUpload.data);
     passthroughStream.end();
 
@@ -58,6 +57,6 @@ export const addSolverFile = async (fileUpload: UploadedFile) => {
         passthroughStream.pipe(file.createWriteStream()).on('finish', () => {})}
     streamFileUpload().catch(console.error);
     const solvername = fileUpload.name.slice(0, fileUpload.name.length-".tar.gz".length);
-    k8s().api.createNamespacedPod("default", kanikoPod(solvername));
+    k8s().coreApi.createNamespacedPod("default", kanikoPod(solvername));
     return true; 
 }

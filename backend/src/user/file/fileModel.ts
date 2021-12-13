@@ -29,7 +29,7 @@ export const getFileType = (name: string): FileType | undefined => {
     return undefined;
 }
 
-export default (userId: string) => firestore()
+export const FileCollection = (userId: string) => firestore()
     .collection("User")
     .doc(userId)
     .collection("File")

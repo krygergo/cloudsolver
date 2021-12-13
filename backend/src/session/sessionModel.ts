@@ -21,4 +21,4 @@ const sessionConverter: FirestoreDataConverter<Session> = {
     }
 }
 
-export default () => firestore().collection("Session").withConverter(sessionConverter);
+export const SessionCollection = () => firestore().collection("Session").withConverter(sessionConverter);

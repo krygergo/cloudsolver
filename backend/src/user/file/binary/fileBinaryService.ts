@@ -1,11 +1,11 @@
-import fileBinaryCollection from "./fileBinaryModel";
+import { FileBinaryCollection } from "./fileBinaryModel";
 
-export default (userId: string) => {
-    const fileBinaryCol = fileBinaryCollection(userId);
+export const FileBinaryService = (userId: string) => {
+    const fileBinaryCollection = FileBinaryCollection(userId);
 
-    const createFileBinaryDoc = () => fileBinaryCol.doc();
+    const createFileBinaryDoc = () => fileBinaryCollection.doc();
     
-    const getFileBinaryDoc = (fileBinaryId: string) => fileBinaryCol.doc(fileBinaryId);
+    const getFileBinaryDoc = (fileBinaryId: string) => fileBinaryCollection.doc(fileBinaryId);
     
     const getFileBinaryById = async (fileBinaryId: string) => {
         const fileBinary = await getFileBinaryDoc(fileBinaryId).get();

@@ -9,6 +9,7 @@ import { getUserSessionById } from "../session/sessionService";
 import userRoute from "../user/userController";
 import clusterRoute from "../cluster/clusterController";
 import adminRoute from "../admin/adminController";
+import solverRoute from "../solver/solverController";
 import { env } from "./environment";
 import firestore from "./database/googleFirestore";
 
@@ -60,5 +61,6 @@ route.use("/user", userRoute);
 route.use("/file", fileRoute);
 route.use("/cluster", clusterRoute);
 route.use("/admin", adminRoute)
+route.use("/solver", solverRoute)
 
 export { route };
