@@ -52,7 +52,7 @@ interface Result {
     output: string
 }
 
-type Status = "FAILED" | "RUNNING" | "SUCCESS"
+type Status = "FAILED" | "PENDING" | "SUCCESS"
 
 const firestore = new Firestore();
 

@@ -3,7 +3,7 @@ import { FileBinaryCollection } from "./fileBinaryModel";
 export const FileBinaryService = (userId: string) => {
     const fileBinaryCollection = FileBinaryCollection(userId);
 
-    const createFileBinaryDoc = () => fileBinaryCollection.doc();
+    const createFileBinaryDoc = (fileBinaryId: string) => fileBinaryCollection.doc(fileBinaryId);
     
     const getFileBinaryDoc = (fileBinaryId: string) => fileBinaryCollection.doc(fileBinaryId);
     

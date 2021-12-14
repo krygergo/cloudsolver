@@ -3,6 +3,7 @@ import { UploadedFile } from "express-fileupload";
 import { FileBinaryService } from "./binary/fileBinaryService";
 import googleFirestore from "../../config/database/googleFirestore";
 import { Response } from "express";
+import { v4 as uuid } from "uuid";
 
 const firestore = googleFirestore();
 
@@ -15,12 +16,12 @@ export const FileService = (userId: string) => {
         if(!fileSnapshot.empty)
             return undefined;
         const batch = firestore.batch();
-        const fileBinaryDoc = fileBinaryService.createFileBinaryDoc();
+        const fileBinaryDoc = fileBinaryService.createFileBinaryDoc(uuid());
         batch.set(fileBinaryDoc, {
             id: fileBinaryDoc.id,
             binary: uploadedFile.data
         });
-        const fileDoc = fileCollection.doc();
+        const fileDoc = fileCollection.doc(uuid());
         const timeStamp = Date.now();
         batch.set(fileDoc, {
             id: fileDoc.id,

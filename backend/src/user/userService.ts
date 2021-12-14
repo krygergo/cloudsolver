@@ -1,21 +1,20 @@
 import bcrypt from "bcrypt";
 import collection, { isAdmin, UserRight } from "./userModel";
-
-const createUser = () => collection().doc();
+import { v4 as uuid } from "uuid";
 
 export async function addUser(username: string, password: string, userRight: UserRight = "DEFAULT") {
     const userSnapshot = await collection().where("username", "==", username).get();
     if(!userSnapshot.empty)
         return undefined;
-    const user = createUser();
-    collection().doc(user.id).set({
-        id: user.id,
+    const userId = uuid();
+    collection().doc(userId).set({
+        id: userId,
         username: username,
         hashedPassword: await bcrypt.hash(password, 10),
         userRight: userRight,
         createdAt: Date.now()
     });
-    return user.id;
+    return userId;
 }
 
 export const getUserById = async (id: string) => (await collection().doc(id).get()).data();

@@ -4,5 +4,3 @@ WORKDIR /app
 
 COPY node_modules ./node_modules
 COPY build/output/app.* ./
-
-CMD node app.js
