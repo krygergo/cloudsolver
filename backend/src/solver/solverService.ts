@@ -95,10 +95,12 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
 export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solver: string, flags: string) => {
+    const startSolverJob = (mznFileId: string, dznFileId: string, solvers: string[], flags: string) => {
         try {
-            const jobId = await jobService.addJob(mznFileId, dznFileId, flags);
-            await k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver));
+            solvers.forEach(async (solver) => {
+                const jobId = await jobService.addJob(mznFileId, dznFileId, flags);
+                await k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver));
+            });
         } catch(error) {
             console.log(error);
         }

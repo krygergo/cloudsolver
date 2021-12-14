@@ -12,6 +12,7 @@ export interface Job {
 
 interface Result {
     status: Status
+    solver?: string
     output?: string
 }
 

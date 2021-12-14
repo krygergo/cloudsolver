@@ -1,5 +1,5 @@
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import { readFile } from "fs";
+import { readFile, readFileSync } from "fs";
 
 const jobConverter: FirestoreDataConverter<Job> = {
     toFirestore(job: Job) {
@@ -15,15 +15,18 @@ interface Job {
     id: string
     mznFileId: string
     dznFileId: string
+    flags: string
     result: Result
+    createdAt: number
 }
 
 interface Result {
     status: Status
+    solver: string
     output: string
 }
 
-type Status = "FAILED" | "RUNNING" | "SUCCESS"
+type Status = "FAILED" | "PENDING" | "SUCCESS"
 
 const firestore = new Firestore();
 
@@ -33,17 +36,37 @@ const main = async () => {
     const userId = args[0];
     const jobId = args[1];
 
-    readFile("/shared/result.txt", (error, data) => {
-        if(error)
-            throw error;
-        
-        firestore.collection("User").doc(userId).collection("Job").withConverter(jobConverter).doc(jobId).update({
-            result: {
-                status: "SUCCESS",
-                output: Buffer.from(data).toString()
-            }
+    const jobReference = firestore.collection("User").doc(userId).collection("Job").doc(jobId).withConverter(jobConverter);
+
+    try {
+        const transaction = await firestore.runTransaction(async (transaction) => {
+            const jobSnapshot = await transaction.get(jobReference);
+
+            if(!jobSnapshot.exists)
+                return undefined;
+                
+            const job = jobSnapshot.data()!;
+
+            if(job.result.status !== "PENDING")
+                return undefined;
+                
+            const data = readFileSync("/shared/result.txt");
+
+            transaction.update(jobReference, {
+                result: {
+                    status: "SUCCESS",
+                    output: Buffer.from(data).toString()
+                } 
+            });
+            return true;
         });
-    });
+        if(!transaction)
+            return;
+        
+        //todo terminate other pods if there are multiple pods running this job
+    } catch(error) {
+        console.log(error);
+    }
 }
 
 main();
