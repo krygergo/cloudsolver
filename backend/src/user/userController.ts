@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { auth } from "../auth/auth";
+import { isAdmin } from "./userModel";
 
 import { deleteUserById, getUserById } from "./userService";
 
@@ -12,8 +13,10 @@ route.get("/", async (req, res) => {
 });
 
 route.delete("/:userId", auth, async (req, res) => {
-    const userId = req.session.userId!;
-    await deleteUserById(userId);
+    const user = (await getUserById(req.session.userId!))!;
+    if(!isAdmin(user.userRight))
+        return res.status(403).send("User is not admin");
+    deleteUserById(user.id);
     res.sendStatus(200);
 });
 

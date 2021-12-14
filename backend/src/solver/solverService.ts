@@ -99,9 +99,7 @@ export const SolverService = (userId: string) => {
     const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], flags: string) => {
         try {
             const jobId = await jobService.addJob(mznFileId, dznFileId, flags);
-            solvers.forEach(solver => {
-                k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver));
-            });
+            solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver)));
         } catch(error) {
             console.log(error);
         }
