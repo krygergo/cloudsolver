@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { verifyUserAdminRight } from "../user/userService";
+import { deleteUserById, verifyUserAdminRight } from "../user/userService";
 import fileUpload from "express-fileupload";
 import { addSolverFile } from "./solver/file/solverFileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
+import { auth } from "../auth/auth";
 
 const route = Router();
 
@@ -13,6 +14,11 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 route.use(verifyAdmin);
+
+route.delete("/user/:userId", auth, (req, res) => {
+    deleteUserById(req.session.userId!);
+    res.sendStatus(200);
+});
 
 route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     if(!req.files)
@@ -28,7 +34,7 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
         return res.status(415).send("The file extension must be .tar.gz.");
     if(!await addSolverFile(file))
         return res.status(400).send("The file already exists or an unexpected error occured.");
-    return res.status(201).send("Successfully uploaded the solver Dockerfile.");
+    return res.status(201).send("Successfully uploaded the solverfile.");
 });
 
 export default route;
