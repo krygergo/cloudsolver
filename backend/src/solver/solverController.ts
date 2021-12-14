@@ -9,16 +9,23 @@ const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
 route.get("/", async (_, res) => {
     const images = await artifactRegistryService.getAllImages();
-    if(!images)
+    if(images.length === 0)
         return res.status(400).send("No solvers supported");
     res.send(({ images: images }));
 })
 
-route.post("/", (req, res) => {
+route.post("/", async (req, res) => {
     const body = req.body;
-    SolverService(req.session.userId!).startSolverJob(
-        body.mznFileId, body.dznFileId, body.solvers, body.flags
-    );
+    if(!body.mznFileId)
+        return res.status(400).send("No mznField");
+    if(!body.dznFileId)
+        return res.status(400).send("No dznField");
+    if(!body.solvers)
+        return res.status(400).send("No solvers");
+    if(!Array.isArray(body.solvers))
+        return res.status(400).send("Solvers field must be of type array");
+    if(!(await SolverService(req.session.userId!).startSolverJob(body.mznFileId, body.dznFileId, body.solvers, body.flags)))
+        return res.status(400).send("Error in request body");
     res.sendStatus(200);
 });
 

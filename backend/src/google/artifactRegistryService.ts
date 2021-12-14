@@ -8,8 +8,6 @@ export const ArtifactRegistryService = (location: string, repository: string) =>
         const [images] = await artifactRegistry.listPackages({
             parent: repositoryPath
         });
-        if(images.length == 0)
-            return undefined;
         return images.map((image) => image.name?.slice(repositoryPath.length + "/packages/".length)!);
     }
 

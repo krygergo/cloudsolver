@@ -1,5 +1,6 @@
 import { V1Job } from "@kubernetes/client-node";
 import k8s from "../config/kubernetes";
+import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { JobService } from "../user/job/jobService";
 
 const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => ({
@@ -95,10 +96,13 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
 
 export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
+    const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], flags: string) => {
+    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], flags?: string) => {
+        if(!solvers.every(async solver => (await artifactRegistryService.getAllImages()).includes(solver)))
+            return undefined;
         try {
-            const jobId = await jobService.addJob(mznFileId, dznFileId, flags);
+            const jobId = await jobService.addJob(mznFileId, dznFileId, flags ? flags : "");
             solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver)));
         } catch(error) {
             console.log(error);

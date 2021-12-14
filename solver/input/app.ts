@@ -42,7 +42,7 @@ interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    flags: string
+    flags?: string
     result: Result 
 }
 
@@ -104,10 +104,12 @@ const main = async () => {
             throw error;
     });
 
-    writeFile("/shared/flagFile.txt", Buffer.from(job.flags), (error) => {
-        if(error)
-            throw error;
-    });
+    if(job.flags) {
+        writeFile("/shared/flagFile.txt", Buffer.from(job.flags), (error) => {
+            if(error)
+                throw error;
+        });
+    }
 }
 
 main();

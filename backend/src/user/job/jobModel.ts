@@ -5,7 +5,7 @@ export interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    flags: string
+    flags?: string
     result: Result
     createdAt: number
 }
