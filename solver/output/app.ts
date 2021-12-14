@@ -10,7 +10,6 @@ const jobConverter: FirestoreDataConverter<Job> = {
     }
 }
 
-
 interface Job {
     id: string
     mznFileId: string

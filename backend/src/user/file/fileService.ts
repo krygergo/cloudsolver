@@ -92,12 +92,12 @@ export const FileService = (userId: string) => {
         }
 
         const listenOnChange = (res: Response) => {
-            const unsub = query.onSnapshot((snapshot) => {
+            const unsub = query.onSnapshot(snapshot => {
                 if(!snapshot.empty) {
                     res.send(snapshot.docs[0].data());
                     unsub();
                 }
-            },(error) => res.status(500).send("Error listening on file"));
+            },error => res.status(500).send("Error listening on file"));
         }
 
         return {
@@ -108,7 +108,7 @@ export const FileService = (userId: string) => {
 
     const getAllFiles = async () => {
         const fileSnapshot = await fileCollection.get();
-        return fileSnapshot.docs.map((doc) => doc.data());
+        return fileSnapshot.docs.map(doc => doc.data());
     }
 
     return {
