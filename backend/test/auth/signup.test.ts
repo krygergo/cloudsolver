@@ -31,11 +31,6 @@ describe("POST /signup", () => {
     });
 });
 
-describe("Check users without cookie", 
-    () =>  test("Check users", ()  => 
-        supertest(app).get("/user").expect(401)
-    )
-);
 
 
 /*
