@@ -13,7 +13,8 @@ export const JobService = (userId: string) => {
             flags: flags,
             result: {
                 status: "PENDING"
-            }
+            },
+            createdAt: Date.now()
         });
         return jobId;
     }

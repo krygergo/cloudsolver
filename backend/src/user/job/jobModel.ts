@@ -7,6 +7,7 @@ export interface Job {
     dznFileId: string
     flags: string
     result: Result
+    createdAt: number
 }
 
 interface Result {
