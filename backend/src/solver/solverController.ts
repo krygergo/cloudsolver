@@ -17,7 +17,7 @@ route.get("/", async (_, res) => {
 route.post("/", (req, res) => {
     const body = req.body;
     SolverService(req.session.userId!).startSolverJob(
-        body.mznFileId, body.dznFileId, body.solver, body.flags
+        body.mznFileId, body.dznFileId, body.solvers, body.flags
     );
     res.sendStatus(200);
 });
