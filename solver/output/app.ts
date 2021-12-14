@@ -1,5 +1,5 @@
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import { readFile, readFileSync } from "fs";
+import { readFileSync } from "fs";
 
 const jobConverter: FirestoreDataConverter<Job> = {
     toFirestore(job: Job) {
@@ -35,32 +35,34 @@ const main = async () => {
 
     const userId = args[0];
     const jobId = args[1];
+    const solver = args[2];
 
     const jobReference = firestore.collection("User").doc(userId).collection("Job").doc(jobId).withConverter(jobConverter);
 
     try {
-        const transaction = await firestore.runTransaction(async (transaction) => {
+        const transaction = await firestore.runTransaction(async transaction => {
             const jobSnapshot = await transaction.get(jobReference);
 
             if(!jobSnapshot.exists)
-                return undefined;
+                return Promise.reject("Job do not exists");
                 
             const job = jobSnapshot.data()!;
 
-            if(job.result.status !== "PENDING")
-                return undefined;
+            if(job.result.status === "SUCCESS")
+                return Promise.reject("The job is allready handled");
                 
             const data = readFileSync("/shared/result.txt");
 
             transaction.update(jobReference, {
                 result: {
                     status: "SUCCESS",
+                    solver: solver,
                     output: Buffer.from(data).toString()
                 } 
             });
-            return true;
+            return Promise.resolve("Success");
         });
-        if(!transaction)
+        if(transaction !== "Success")
             return;
         
         //todo terminate other pods if there are multiple pods running this job
