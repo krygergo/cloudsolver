@@ -7,7 +7,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
-        name: `${solver}-${userId}`
+        name: `${jobId}-${solver}`
     },
     spec: {
         template: {
@@ -46,7 +46,9 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
                         "/shared/dznFile.dzn",
                         "--output-time",
                         "--output-to-file",
-                        "/shared/result.txt"
+                        "/shared/result.txt",
+                        "--param-file",
+                        "/shared/flagFile.txt"
                     ],
                     volumeMounts: [{
                         name: "shared-data",
@@ -99,11 +101,13 @@ export const SolverService = (userId: string) => {
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
     const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], flags?: string) => {
-        if(!solvers.every(async solver => (await artifactRegistryService.getAllImages()).includes(solver)))
+        const images = await artifactRegistryService.getAllImages();
+        if(!solvers.every(solver => images.includes(solver)))
             return undefined;
         try {
             const jobId = await jobService.addJob(mznFileId, dznFileId, flags ? flags : "");
             solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver)));
+            return true;
         } catch(error) {
             console.log(error);
         }

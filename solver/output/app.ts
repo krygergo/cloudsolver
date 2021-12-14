@@ -1,5 +1,10 @@
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 import { readFileSync } from "fs";
+import { KubeConfig, CoreV1Api, BatchV1Api } from "@kubernetes/client-node";
+
+const config = new KubeConfig();
+config.loadFromDefault();
+const batchApi = config.makeApiClient(BatchV1Api)
 
 const jobConverter: FirestoreDataConverter<Job> = {
     toFirestore(job: Job) {
@@ -25,7 +30,7 @@ interface Result {
     output: string
 }
 
-type Status = "FAILED" | "PENDING" | "SUCCESS"
+type Status = "PENDING" | "FINISHED"
 
 const firestore = new Firestore();
 
@@ -47,24 +52,29 @@ const main = async () => {
                 
             const job = jobSnapshot.data()!;
 
-            if(job.result.status === "SUCCESS")
+            if(job.result.status === "FINISHED")
                 return Promise.reject("The job is allready handled");
                 
             const data = readFileSync("/shared/result.txt");
 
             transaction.update(jobReference, {
                 result: {
-                    status: "SUCCESS",
+                    status: "FINISHED",
                     solver: solver,
                     output: Buffer.from(data).toString()
                 } 
             });
             return Promise.resolve("Success");
         });
+
         if(transaction !== "Success")
             return;
-        
-        //todo terminate other pods if there are multiple pods running this job
+            
+        const joblist = await batchApi.listNamespacedJob("default");
+        joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
+            batchApi.deleteNamespacedJob(job.metadata!.name!, "default", undefined, undefined, undefined, undefined, "Background");
+        })
+
     } catch(error) {
         console.log(error);
     }

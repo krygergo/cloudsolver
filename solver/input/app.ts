@@ -42,7 +42,7 @@ interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    flags?: string
+    flags: string
     result: Result 
 }
 
@@ -94,22 +94,20 @@ const main = async () => {
     
     const dznFileBinary = dznFileBinarySnapshot.data()!;
 
-    writeFile("/shared/mznFile.mzn", Buffer.from(mznFileBinary.binary), (error) => {
+    writeFile("/shared/mznFile.mzn", mznFileBinary.binary, (error) => {
         if(error)
             throw error;
     });
 
-    writeFile("/shared/dznFile.dzn", Buffer.from(dznFileBinary.binary), (error) => {
+    writeFile("/shared/dznFile.dzn", dznFileBinary.binary, (error) => {
         if(error)
             throw error;
     });
 
-    if(job.flags) {
-        writeFile("/shared/flagFile.txt", Buffer.from(job.flags), (error) => {
-            if(error)
-                throw error;
-        });
-    }
+    writeFile("/shared/flagFile.txt", job.flags, (error) => {
+        if(error)
+            throw error;
+    });
 }
 
 main();
