@@ -61,7 +61,7 @@ jest.mock("../../src/session/sessionService", () => ({
     })
 }))
 
-describe("Checking users", () => {
+describe("Checking users/Deleting users", () => {
     it("Access userprofiles with cookie", async () => {
         const req = {
                 "username" : "adminUser",
@@ -110,6 +110,21 @@ describe("Checking users", () => {
             const cookie = res.header["set-cookie"][1] as string;
             await supertest(app).delete("/admin/user/2").set('Cookie', cookie).send(req).expect(403)
         });
+    it("Checking files in solver", async () => {
+        const req = {
+            "username" : "adminUser",
+            "password" : "correctPass",
+        "session" : {
+                "userId" : "1"
+            }
+        }
+        const res = await supertest(app)
+        .post("/login")
+        .send(req);
+        admin = true
+        const cookie = res.header["set-cookie"][1] as string;
+        await supertest(app).post("/admin/solver").set('Cookie', cookie).send(req).expect(404)
+    })
 });
 
 
