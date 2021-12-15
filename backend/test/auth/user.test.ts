@@ -42,6 +42,7 @@ jest.mock("../../src/user/userService", () => ({
             return undefined;
         return isAdmin(user.userRight);
     })
+    //Denne funktion flyttes?:)
 }))
 
 jest.mock("../../src/session/sessionService", () => ({
@@ -126,6 +127,8 @@ describe("Checking users/Deleting users", () => {
         await supertest(app).post("/admin/solver").set('Cookie', cookie).send(req).expect(404)
     })
 });
+
+
 
 
 
