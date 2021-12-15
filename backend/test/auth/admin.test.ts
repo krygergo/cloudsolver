@@ -36,6 +36,7 @@ jest.mock("../../src/user/userService", () => ({
         if (userid === "2")
             return undefined
     }),
+    
     verifyUserAdminRight: jest.fn(async (userId: string) => { 
         const user = await getUserById(userId);
         if (!user)
@@ -43,6 +44,7 @@ jest.mock("../../src/user/userService", () => ({
         return isAdmin(user.userRight);
     })
     //Denne funktion flyttes?:)
+    
 }))
 
 jest.mock("../../src/session/sessionService", () => ({
@@ -96,7 +98,7 @@ describe("Deleting users", () => {
     });
 
 describe("/solver admin rights", () => {
-    it("Checking files in solver", async () => {
+    it("file not found", async () => {
         const req = {
             "username" : "adminUser",
             "password" : "correctPass",
