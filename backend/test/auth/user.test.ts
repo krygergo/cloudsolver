@@ -1,7 +1,9 @@
-
 import supertest from "supertest"
 import app from "../../src/app";
+import { isAdmin } from "../../src/user/userModel";
+import { getUserById } from "../../src/user/userService";
 
+let admin:boolean = true;
 
 jest.mock("../../src/user/userService", () => ({
     getUserByUsername: jest.fn((username: string) => {
@@ -33,20 +35,31 @@ jest.mock("../../src/user/userService", () => ({
     deleteUserById: jest.fn((userid: string)  => {
         if (userid === "2")
             return undefined
-        
+    }),
+    verifyUserAdminRight: jest.fn(async (userId: string) => { 
+        const user = await getUserById(userId);
+        if (!user)
+            return undefined;
+        return isAdmin(user.userRight);
     })
 }))
 
-
 jest.mock("../../src/session/sessionService", () => ({
     getUserSessionById: jest.fn(()  => {
-        var sessionId = { 
-            userId: "1"
+        if (admin === true) {
+            var sessionId = { 
+                userId: "1"
+                }
+            return sessionId 
+        }
+        else if (admin === false) {
+            var sessionId2 = {
+                userId: "2"
             }
-        return sessionId     
-         }) 
+            return sessionId2
+        }
+    })
 }))
-
 
 describe("Checking users", () => {
     it("Access userprofiles with cookie", async () => {
@@ -80,10 +93,8 @@ describe("Checking users", () => {
             .send(req);
             const cookie = res.header["set-cookie"][1] as string;
             await supertest(app).delete("/admin/user/2").set('Cookie', cookie).send(req).expect(200)
-                 
-   
         });
-    /*
+    
     it("Delete user whilst not admin", async () => {
         const req = {
                 "username" : "normalUser",
@@ -95,13 +106,10 @@ describe("Checking users", () => {
         const res = await supertest(app)
             .post("/login")
             .send(req);
+            admin = false
             const cookie = res.header["set-cookie"][1] as string;
-            await supertest(app).delete("/user/2").set('Cookie', cookie).send(req).expect(200)
-                    
-    
+            await supertest(app).delete("/admin/user/2").set('Cookie', cookie).send(req).expect(403)
         });
-        */
-
 });
 
 
