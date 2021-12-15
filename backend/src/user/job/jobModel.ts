@@ -5,9 +5,10 @@ export interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    flags?: string
+    config: {key: string, value: any}[]
     result: Result
     createdAt: number
+    finishedAt?: number
 }
 
 interface Result {
@@ -16,7 +17,7 @@ interface Result {
     output?: string
 }
 
-type Status = "FAILED" | "PENDING" | "SUCCESS"
+type Status = "PENDING" | "FINISHED"
 
 const jobConverter: FirestoreDataConverter<Job> = {
     toFirestore(job: Job) {

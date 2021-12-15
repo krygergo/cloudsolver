@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { deleteUserById, verifyUserAdminRight } from "../user/userService";
 import fileUpload from "express-fileupload";
-import { addSolverFile } from "./solver/file/solverFileService";
+import { addSolverFile } from "../solver/file/solverFileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
 import { auth } from "../auth/auth";
 

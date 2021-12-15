@@ -47,7 +47,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
         return res.send(file);
     })
 
-    route.get("/name/listen/:name", (req, res) => fileService.fileByName(req.params.name).listenOnChange(res as Response));
+    route.get("/name/listen/:name", (req, res) => fileService.fileByName(req.params.name).listenOnChange(req, res));
 
     route.get("/binary/:fileBinaryId", async (req, res) => {
         const fileBinary = await fileBinaryService.getFileBinaryById(req.params.fileBinaryId);

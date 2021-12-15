@@ -22,7 +22,7 @@ declare module "express-session" {
 declare module "express" {
     interface Response {
         locals: {
-            file: fileUpload.UploadedFile | undefined
+            file?: fileUpload.UploadedFile | undefined
         }
     }
 }

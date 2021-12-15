@@ -1,0 +1,8 @@
+#!/bin/bash
+
+npx tsc && \
+docker build --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/output" --build-arg BUILDFOLDER=build/output/app.* . && \
+docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/output" && \
+docker build --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/input" --build-arg BUILDFOLDER=build/input/app.* . && \
+docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/input" && \
+docker images | grep none | awk '{ print $3; }' | xargs docker rmi

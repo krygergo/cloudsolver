@@ -42,17 +42,8 @@ interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    flags: string
-    result: Result 
+    config: {key: string, value: any}[]
 }
-
-interface Result {
-    status: Status
-    executionTime: number
-    output: string
-}
-
-type Status = "FAILED" | "PENDING" | "SUCCESS"
 
 const firestore = new Firestore();
 
@@ -104,10 +95,16 @@ const main = async () => {
             throw error;
     });
 
-    writeFile("/shared/flagFile.txt", job.flags, (error) => {
+    const configJSON = JSON.stringify({
+        "output-time": true,
+        "output-file": "/shared/result.txt"
+    });
+
+    writeFile("/shared/config.mpc", configJSON, (error) => {
         if(error)
             throw error;
     });
+
 }
 
 main();

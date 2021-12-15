@@ -1,7 +1,7 @@
 import { UploadedFile } from "express-fileupload";
-import storage from "../../../config/googleStorage"
+import storage from "../../config/googleStorage"
 import { PassThrough } from "stream"
-import k8s from "../../../config/kubernetes"
+import k8s from "../../config/kubernetes"
 import { V1Job } from "@kubernetes/client-node";
 
 const bucket = storage().bucket("cloudsolver-334113.appspot.com");

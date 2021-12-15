@@ -2,7 +2,7 @@ import { FileCollection } from "./fileModel";
 import { UploadedFile } from "express-fileupload";
 import { FileBinaryService } from "./binary/fileBinaryService";
 import googleFirestore from "../../config/database/googleFirestore";
-import { Response } from "express";
+import { Request, Response } from "express";
 import { v4 as uuid } from "uuid";
 
 const firestore = googleFirestore();
@@ -91,13 +91,17 @@ export const FileService = (userId: string) => {
             return fileSnapshot.docs[0].data()!;
         }
 
-        const listenOnChange = (res: Response) => {
+        const listenOnChange = (req: Request, res: Response) => {
             const unsub = query.onSnapshot(snapshot => {
                 if(!snapshot.empty) {
                     res.send(snapshot.docs[0].data());
                     unsub();
                 }
-            },error => res.status(500).send("Error listening on file"));
+            },() => res.status(500).send("Error listening on file"));
+            req.once("close", () => {
+                unsub();
+                res.end();
+            });
         }
 
         return {

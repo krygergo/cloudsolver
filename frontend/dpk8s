@@ -3,5 +3,6 @@
 npm run build && \
 docker build -f Dockerfile.production --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/frontend/react:latest" . && \
 docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/frontend/react:latest" && \
+docker images | grep none | awk '{ print $3; }' | xargs docker rmi && \
 kubectl delete deployments react && \
 kubectl apply -f ../.github/kubernetes/frontend/deployment.yml

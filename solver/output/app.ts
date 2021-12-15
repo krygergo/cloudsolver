@@ -1,6 +1,6 @@
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 import { readFileSync } from "fs";
-import { KubeConfig, CoreV1Api, BatchV1Api } from "@kubernetes/client-node";
+import { KubeConfig, BatchV1Api } from "@kubernetes/client-node";
 
 const config = new KubeConfig();
 config.loadFromDefault();
@@ -22,12 +22,13 @@ interface Job {
     flags: string
     result: Result
     createdAt: number
+    finishedAt?: number
 }
 
 interface Result {
     status: Status
-    solver: string
-    output: string
+    solver?: string
+    output?: string
 }
 
 type Status = "PENDING" | "FINISHED"
@@ -58,6 +59,7 @@ const main = async () => {
             const data = readFileSync("/shared/result.txt");
 
             transaction.update(jobReference, {
+                finishedAt: Date.now(),
                 result: {
                     status: "FINISHED",
                     solver: solver,
@@ -72,7 +74,7 @@ const main = async () => {
             
         const joblist = await batchApi.listNamespacedJob("default");
         joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
-            batchApi.deleteNamespacedJob(job.metadata!.name!, "default", undefined, undefined, undefined, undefined, "Background");
+            batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
         })
 
     } catch(error) {

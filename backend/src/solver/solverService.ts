@@ -42,13 +42,9 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
                         "minizinc"
                     ],
                     args: [
+                        "/shared/config.mpc",
                         "/shared/mznFile.mzn",
                         "/shared/dznFile.dzn",
-                        "--output-time",
-                        "--output-to-file",
-                        "/shared/result.txt",
-                        "--param-file",
-                        "/shared/flagFile.txt"
                     ],
                     volumeMounts: [{
                         name: "shared-data",
@@ -92,7 +88,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
             }
         },
         activeDeadlineSeconds: 60 * 5, // Must finish within 5min
-        ttlSecondsAfterFinished: 0
+        ttlSecondsAfterFinished: 300
     }
 });
 
@@ -100,12 +96,12 @@ export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], flags?: string) => {
+    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], config?: {key: string, value: any}[]) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
             return undefined;
         try {
-            const jobId = await jobService.addJob(mznFileId, dznFileId, flags ? flags : "");
+            const jobId = await jobService.addJob(mznFileId, dznFileId, config);
             solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver)));
             return true;
         } catch(error) {
