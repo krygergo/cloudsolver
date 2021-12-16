@@ -14,8 +14,8 @@ export async function addUser(username: string, password: string, userRight: Use
         hashedPassword: await bcrypt.hash(password, 10),
         userRight: userRight,
         createdAt: Date.now(),
-        vCPUMax: "100m",
-        memoryMax: "200Mi"
+        vCPUMax: 100,
+        memoryMax: 200
     });
     return userId;
 }
@@ -40,7 +40,7 @@ export const verifyUserAdminRight = async (userId: string) => {
     return isAdmin(user.userRight);
 }
 
-export const updateUserResourcesById = async (userId: string, vCPUMax?: string, memoryMax?: string) => {  
+export const updateUserResourcesById = async (userId: string, vCPUMax?: number, memoryMax?: number) => {  
     const user = await getUserById(userId);
     if(!user)
         return false;

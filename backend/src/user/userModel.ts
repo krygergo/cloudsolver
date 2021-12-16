@@ -9,8 +9,8 @@ export interface User {
     hashedPassword: string
     userRight: UserRight
     createdAt: number
-    vCPUMax: string
-    memoryMax: string
+    vCPUMax: number
+    memoryMax: number
 }
 
 const userConverter: FirestoreDataConverter<User> = {
