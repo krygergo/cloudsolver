@@ -6,7 +6,7 @@ import { getUserById } from "../userService";
 export const JobService = (userId: string) => {
     const jobCollection = JobCollection(userId);
 
-    const addJob = async (mznFileId: string, dznFileId: string,memoryMax: number, vCPUMax: number, 
+    const addJob = async (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, 
         config: {[key: string]: any} = {}, solvers: string[], status: Status = "RUNNING") => {
         const jobId = uuid();
         await jobCollection.doc(jobId).set({
@@ -34,14 +34,14 @@ export const JobService = (userId: string) => {
         const memoryMax = (await getUserById(userId))?.memoryMax!;
         const remainingMemoryUsage = (await getAllJobs())
             .filter(job => job.result.status === "RUNNING")
-            .reduce((total:number,nextJob:Job)=>total+nextJob.memoryMax,0);
+            .reduce((total:number,nextJob:Job) => total + nextJob.memoryMax, 0);
         return memoryMax - remainingMemoryUsage;
     }
     const getAvailablevCPU = async ()  => {
         const vCPUMax = (await getUserById(userId))?.vCPUMax!;
         const remainingvCPUMax = (await getAllJobs())
             .filter(job => job.result.status === "RUNNING")
-            .reduce((total:number,nextJob:Job)=>total+nextJob.vCPUMax,0);
+            .reduce((total:number,nextJob:Job) => total + nextJob.vCPUMax, 0);
         return vCPUMax - remainingvCPUMax;
     } 
 

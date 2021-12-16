@@ -103,7 +103,7 @@ export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[],memoryMax: number,vCPUMax: number, config?: {[key: string]: any}) => {
+    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], memoryMax: number, vCPUMax: number, config?: {[key: string]: any}) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
             return undefined;
@@ -112,7 +112,7 @@ export const SolverService = (userId: string) => {
                 jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config, solvers, "QUEUED");
             } else {
                 const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config, solvers);
-                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver,memoryMax,vCPUMax)));
+                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver, memoryMax, vCPUMax)));
             }
             return true;
         } catch(error) {

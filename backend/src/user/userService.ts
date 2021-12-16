@@ -1,7 +1,6 @@
 import bcrypt from "bcrypt";
 import collection, { isAdmin, UserRight } from "./userModel";
 import { v4 as uuid } from "uuid";
-import { unwatchFile } from "fs";
 
 export async function addUser(username: string, password: string, userRight: UserRight = "DEFAULT") {
     const userSnapshot = await collection().where("username", "==", username).get();
