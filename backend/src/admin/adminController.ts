@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { deleteUserById, verifyUserAdminRight } from "../user/userService";
+import { deleteUserById, updateUserResourcesById, verifyUserAdminRight } from "../user/userService";
 import fileUpload from "express-fileupload";
 import { addSolverFile } from "../solver/file/solverFileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
@@ -20,6 +20,16 @@ route.delete("/user/:userId", auth, (req, res) => {
     res.sendStatus(200);
 });
 
+route.put("/user/:userId", async (req, res) => {
+    if(!req.body.vCPUMax)
+        return res.status(400).send("No vCPU max specified");
+    if(!req.body.memoryMax)
+        return res.status(400).send("No memory max specified");
+
+    const updated = await updateUserResourcesById(req.params.userId, req.body.vCPUMax, req.body.memoryMax);
+    updated ? res.sendStatus(200): res.sendStatus(400);
+});
+
 route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     if(!req.files)
         return res.status(404).send("File not found!");
@@ -36,6 +46,8 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
         return res.status(400).send("The file already exists or an unexpected error occured.");
     return res.status(201).send("Successfully uploaded the solverfile.");
 });
+
+
 
 export default route;
 

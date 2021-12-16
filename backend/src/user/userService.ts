@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import collection, { isAdmin, UserRight } from "./userModel";
 import { v4 as uuid } from "uuid";
+import { unwatchFile } from "fs";
 
 export async function addUser(username: string, password: string, userRight: UserRight = "DEFAULT") {
     const userSnapshot = await collection().where("username", "==", username).get();
@@ -35,4 +36,19 @@ export const verifyUserAdminRight = async (userId: string) => {
     if (!user)
         return undefined;
     return isAdmin(user.userRight);
+}
+
+export const updateUserResourcesById = async (userId: string, vCPUMax: string, memoryMax: string) => {
+    const user = getUserById(userId);
+    if(!user)
+        return false;
+
+    try{
+        await collection().doc(userId).update({vCPUMax: vCPUMax, memoryMax: memoryMax});
+        return true;
+    }
+    catch(error){
+        console.log(error);
+        return false;
+    }
 }
