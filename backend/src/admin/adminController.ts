@@ -21,10 +21,8 @@ route.delete("/user/:userId", auth, (req, res) => {
 });
 
 route.put("/user/:userId", async (req, res) => {
-    if(!req.body.vCPUMax)
-        return res.status(400).send("No vCPU max specified");
-    if(!req.body.memoryMax)
-        return res.status(400).send("No memory max specified");
+    if(!req.body.vCPUMax && !req.body.memoryMax)
+        return res.status(400).send("No vCPUMax or memoryMax specified");
 
     const updated = await updateUserResourcesById(req.params.userId, req.body.vCPUMax, req.body.memoryMax);
     updated ? res.sendStatus(200): res.sendStatus(400);
