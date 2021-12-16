@@ -18,12 +18,6 @@ route.get("/", async (_, res) => {
 
 route.post("/", async (req, res) => {
     const body = req.body;
-    const currentmemoryMax = req.body.memoryMax ? req.body.memoryMax : JobService(req.session.userId!).getAvailableMemory()
-    const currentvCPUMax = req.body.vCPUMax ? req.body.vCPUMax : JobService(req.session.userId!).getAvailablevCPU()
-    if (currentmemoryMax > JobService(req.session.userId!).getAvailableMemory())
-        return res.status(400).send("Memory capacity exceeded"); 
-    if (currentvCPUMax > JobService(req.session.userId!).getAvailablevCPU())
-        return res.status(400).send("vCPU capacity exceeded"); 
     if(!body.mznFileId)
         return res.status(400).send("No mznField");
     if(!body.dznFileId)
@@ -32,6 +26,12 @@ route.post("/", async (req, res) => {
         return res.status(400).send("No solvers");
     if(!Array.isArray(body.solvers))
         return res.status(400).send("Solvers field must be of type array");
+    const currentmemoryMax = req.body.memoryMax ? req.body.memoryMax : JobService(req.session.userId!).getAvailableMemory()
+    const currentvCPUMax = req.body.vCPUMax ? req.body.vCPUMax : JobService(req.session.userId!).getAvailablevCPU()
+    if (currentmemoryMax > (await getUserById(req.session.userId!))!.vCPUMax)
+        return res.status(400).send("Memory capacity exceeded"); 
+    if (currentvCPUMax > (await getUserById(req.session.userId!))!.memoryMax)
+        return res.status(400).send("vCPU capacity exceeded"); 
     if(!(await SolverService(req.session.userId!).startSolverJob(body.mznFileId, body.dznFileId, body.solvers, currentmemoryMax,currentvCPUMax, body.config)))
         return res.status(400).send("Error in request body");
     res.sendStatus(200);
