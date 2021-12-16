@@ -3,7 +3,7 @@ import k8s from "../config/kubernetes";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { JobService } from "../user/job/jobService";
 
-const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: number,vCPUMax: number): V1Job => ({
+const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
