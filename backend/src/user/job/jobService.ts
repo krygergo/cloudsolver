@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
-import { JobCollection } from "./jobModel"
+import { Job, JobCollection } from "./jobModel"
 import { v4 as uuid } from "uuid";
+import collection from "../userModel";
+import { getUserById } from "../userService";
 
 export const JobService = (userId: string) => {
     const jobCollection = JobCollection(userId);
 
-    const addJob = async (mznFileId: string, dznFileId: string, config: {[key: string]: any} = {}) => {
+    const addJob = async (mznFileId: string, dznFileId: string,memoryMax: number, vCPUMax: number, config: {[key: string]: any} = {}) => {
         const jobId = uuid();
         await jobCollection.doc(jobId).set({
             id: jobId,
@@ -15,7 +17,9 @@ export const JobService = (userId: string) => {
             result: {
                 status: "PENDING"
             },
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            memoryMax: memoryMax,
+            vCPUMax: vCPUMax
         });
         return jobId;
     }
@@ -24,6 +28,17 @@ export const JobService = (userId: string) => {
         const jobSnapshot = await jobCollection.get();
         return jobSnapshot.docs.map((job) => job.data());
     }
+    
+    const getAvailableMemory = async ()  => {
+        const memoryMax = (await getUserById(userId))?.memoryMax!;
+        const remainingMemoryUsage = (await getAllJobs()).reduce((total:number,nextJob:Job)=>total+nextJob.memoryMax,0)
+        return memoryMax - remainingMemoryUsage
+    }
+    const getAvailablevCPU = async ()  => {
+        const vCPUMax = (await getUserById(userId))?.vCPUMax!;
+        const remainingvCPUMax = (await getAllJobs()).reduce((total:number,nextJob:Job)=>total+nextJob.vCPUMax,0)
+        return vCPUMax - remainingvCPUMax
+    } 
 
     const listenOnChange = async (req: Request, res: Response) => {
         res.writeHead(200, {
@@ -44,6 +59,8 @@ export const JobService = (userId: string) => {
     return {
         addJob,
         getAllJobs,
-        listenOnChange
+        listenOnChange,
+        getAvailableMemory,
+        getAvailablevCPU
     }
 }

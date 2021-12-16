@@ -3,7 +3,7 @@ import k8s from "../config/kubernetes";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { JobService } from "../user/job/jobService";
 
-const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => ({
+const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: number,vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
@@ -38,6 +38,13 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
                 }, {
                     name: "minizinc",
                     image: `eu.gcr.io/cloudsolver-334113/${solver}`,
+                    resources:{
+                        limits:{
+                            memory:`${memoryMax}`+`Mi`,
+                            cpu: `${vCPUMax}`+`m`
+                        }
+                    }
+                    ,
                     command: [
                         "minizinc"
                     ],
@@ -96,13 +103,13 @@ export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], config?: {[key: string]: any}) => {
+    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[],memoryMax: number,vCPUMax: number, config?: {[key: string]: any}) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
             return undefined;
         try {
-            const jobId = await jobService.addJob(mznFileId, dznFileId, config);
-            solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver)));
+            const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config);
+            solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver,memoryMax,vCPUMax)));
             return true;
         } catch(error) {
             console.log(error);

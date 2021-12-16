@@ -9,6 +9,8 @@ export interface Job {
     result: Result
     createdAt: number
     finishedAt?: number
+    memoryMax: number
+    vCPUMax: number
 }
 
 interface Result {
