@@ -56,8 +56,10 @@ export default (req: Request, res: Response, next: NextFunction) => {
         res.send(fileBinary);
     });
 
-    route.put("/binary/:fileId", fileUpload(defaultFileUploadConfig), verifyMinizincFile, async (req, res) => {
-        if(!await fileService.fileById(req.params.fileId).updateFileData(res.locals.file!))
+    route.put("/binary/:fileId", async (req, res) => {
+        if(!req.body.binary)
+            return res.status(400).send("No binary data provided");
+        if(!await fileService.fileById(req.params.fileId).updateFileData(req.body.binary))
             return res.status(400).send("File do not exists");
         res.sendStatus(200);        
     });

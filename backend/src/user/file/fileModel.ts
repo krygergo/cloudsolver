@@ -1,12 +1,14 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
-import { UploadedFile } from "express-fileupload";
 import firestore from "../../config/database/googleFirestore";
 
 export type FileType = "mzn" | "dzn"
 
-export interface File extends Omit<UploadedFile, "data" | "mv"> {
+export interface File {
     id: string
     fileBinaryId: string
+    name: string
+    type: FileType
+    size: number
     createdAt: number
     updatedAt: number
 }

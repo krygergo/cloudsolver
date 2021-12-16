@@ -42,7 +42,7 @@ interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    config: {key: string, value: any}[]
+    config: {[key: string]: any}
 }
 
 const firestore = new Firestore();
@@ -95,12 +95,13 @@ const main = async () => {
             throw error;
     });
 
-    const configJSON = JSON.stringify({
+    const config = JSON.stringify({
+        ...job.config,
         "output-time": true,
-        "output-file": "/shared/result.txt"
+        "output-to-file": "/shared/result.txt"
     });
 
-    writeFile("/shared/config.mpc", configJSON, (error) => {
+    writeFile("/shared/config.mpc", config, (error) => {
         if(error)
             throw error;
     });

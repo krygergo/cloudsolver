@@ -29,10 +29,10 @@ route.post("/", async (req, res) => {
     res.sendStatus(200);
 });
 
-route.get("/jobs", async (req, res) => {
+route.get("/job", async (req, res) => {
     res.send(await JobService(req.session.userId!).getAllJobs());
 })
 
-route.get("/jobs/listen", (req, res) => JobService(req.session.userId!).listenOnChange(req, res));
+route.get("/job/listen", (req, res) => JobService(req.session.userId!).listenOnChange(req, res));
 
 export default route;

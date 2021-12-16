@@ -1,4 +1,4 @@
-import { FileCollection } from "./fileModel";
+import { FileCollection, getFileType } from "./fileModel";
 import { UploadedFile } from "express-fileupload";
 import { FileBinaryService } from "./binary/fileBinaryService";
 import googleFirestore from "../../config/database/googleFirestore";
@@ -26,9 +26,11 @@ export const FileService = (userId: string) => {
         batch.set(fileDoc, {
             id: fileDoc.id,
             fileBinaryId: fileBinaryDoc.id,
+            name: uploadedFile.name.slice(0, uploadedFile.name.length - 4),
+            type: getFileType(uploadedFile.name)!,
+            size: uploadedFile.size,
             createdAt: timeStamp,
             updatedAt: timeStamp,
-            ...(({data, mv, ...rest}) => rest)(uploadedFile)
         });
         return batch.commit();
     }
@@ -43,19 +45,16 @@ export const FileService = (userId: string) => {
             return fileSnapshot.data()!;
         }
 
-        const updateFileData = async (uploadedFile: UploadedFile) => {
+        const updateFileData = async (binary: Buffer) => {
             const batch = firestore.batch();
             const file = await getFile();
             if(!file)
                 return undefined;
             batch.update(fileBinaryService.getFileBinaryDoc(file.fileBinaryId), {
-                binary: uploadedFile.data
+                binary: binary
             });
             batch.update(document, {
-                ...file,
-                size: uploadedFile.size,
-                encoding: uploadedFile,
-                checksum: uploadedFile.md5,
+                size: binary.length,
                 updatedAt: Date.now() 
             });
             return batch.commit();
@@ -81,8 +80,10 @@ export const FileService = (userId: string) => {
         }
     }
 
-    const fileByName = (name: string) => {
-        const query = fileCollection.where("name", "==", name);
+    const fileByName = (fileName: string) => {
+        const name = fileName.slice(0, fileName.length -  4);
+        const type = fileName.slice(fileName.length - 3);
+        const query = fileCollection.where("name", "==", name).where("type", "==", type);
         
         const getFile = async () => {
             const fileSnapshot = await query.get();

@@ -1,6 +1,8 @@
 export interface UserFile {
     id: string
     name: string
+    type: string
+    size: number
     fileBinaryId: string
     createdAt: number
     updatedAt: number
@@ -14,5 +16,3 @@ export interface FileBinary {
 }
 
 export type FileType = "mzn" | "dzn";
-
-export const fileType = (fileName: string): FileType => fileName.slice(fileName.length - 3) === "mzn" ? "mzn" : "dzn"

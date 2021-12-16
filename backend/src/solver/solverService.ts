@@ -88,7 +88,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string): V1Job => (
             }
         },
         activeDeadlineSeconds: 60 * 5, // Must finish within 5min
-        ttlSecondsAfterFinished: 300
+        ttlSecondsAfterFinished: 0
     }
 });
 
@@ -96,7 +96,7 @@ export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], config?: {key: string, value: any}[]) => {
+    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], config?: {[key: string]: any}) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
             return undefined;

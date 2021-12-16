@@ -5,7 +5,7 @@ export interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    config: {key: string, value: any}[]
+    config: {[key: string]: any}
     result: Result
     createdAt: number
     finishedAt?: number

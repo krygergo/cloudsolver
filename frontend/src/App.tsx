@@ -6,6 +6,7 @@ import Signup from './auth/Signup';
 import { Container, Row } from 'react-bootstrap';
 import AuthUserRoute from './auth/AuthUserRoute';
 import UserRoute from './user/UserRoute';
+import "./App.css";
 
 function App() {
   return (

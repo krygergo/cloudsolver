@@ -1,13 +1,39 @@
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Row, Col, ListGroup, Form, Button } from 'react-bootstrap';
-import { fileType, UserFile } from '../user/file/FileModel';
+import { UserFile } from '../user/file/FileModel';
 import { getFileBinary, getFileByNameListen, getFiles, postFile } from '../user/file/fileService';
-import SelectedFileProvider, { SelectType, SetFile, useSelectedFile } from './SelectedFileContext';
+import FileProvider, { FileSelect, useFile } from './FileContext';
+
+export interface Job {
+    id: string
+    mznFileId: string
+    dznFileId: string
+    config: {[key: string]: any}
+    result: Result
+    createdAt: number
+    finishedAt?: number
+}
+
+interface Result {
+    status: Status
+    solver?: string
+    output?: string
+}
+
+type Status = "PENDING" | "FINISHED"
 
 export default function Dashboard() {
+
+    //const [jobState, setJobState] = useState<Job[]>([]);
+
+    useEffect(() => {
+        //const eventSource = new EventSource("https://api.cloudsolver.xyz/solver/job/listen", {withCredentials: true});
+        //eventSource.addEventListener("message", message => setJobState(JSON.parse(message.data)));
+    }, []);
+
     return (
         <div className="d-flex text-white">
-            <SelectedFileProvider>
+            <FileProvider>
                 <Col className="col-2" >
                     <Files/>
                 </Col>
@@ -16,30 +42,29 @@ export default function Dashboard() {
                 </Col>
                 <Col>
                 </Col>
-            </SelectedFileProvider>
+            </FileProvider>
         </div>
     );
 }
 
 function Files() {
-    const [files, setFiles] = useState<UserFile[]>([]);
-    const selectedFile = useSelectedFile()!;
+    const { selected, files, setFiles } = useFile()!;
 
     useEffect(() => {
         (async () => {
             const userFiles = await getFiles();
             setFiles(userFiles);
         })();
-    }, []);
+    }, [setFiles]);
     return (
         <div className="d-flex flex-column">
             <Row className="vh-100">
                 <Col>
                     <Row style={{ height: "44vh", width: "100%", overflow: "hidden"}} >
-                        <MZNFiles files={files.filter((file) => fileType(file.name) === "mzn")} />
+                        <MZNFiles files={files.filter(file => file.type  === "mzn")} />
                     </Row>
                     <Row style={{ height: "44vh", width: "100%", overflow: "hidden"}} >
-                        <DZNFiles files={files.filter((file) => fileType(file.name) === "dzn")} />
+                        <DZNFiles files={files.filter(file => file.type === "dzn")} />
                     </Row>
                     <Row style={{ height: "4vh" }} className="d-flex justify-content-center align-items-end">
                         <Form>
@@ -75,24 +100,27 @@ function Files() {
     }
 
     function MZNFiles({files}: {files: UserFile[]}) {
-        const {mzn, setMzn} = selectedFile;
-        return <ListFiles files={files} select={{ file: mzn, setFile: setMzn }}/>
+        const {mzn} = selected;
+        return <ListFiles files={files} select={mzn}/>
     }
 
     function DZNFiles({files}: {files: UserFile[]}) {
-        const {dzn, setDzn} = selectedFile;
-        return <ListFiles files={files} select={{ file: dzn, setFile: setDzn}}/>;
+        const {dzn} = selected;
+        return <ListFiles files={files} select={dzn}/>;
     }
 
-    function ListFiles({files, select}: {files: UserFile[], select: SelectType}) {
+    function ListFiles({files, select}: {files: UserFile[], select: FileSelect}) {
         return (
             <div style={{ width: "100%", height: "90%", overflowY: "scroll", paddingRight: "27px", boxSizing: "content-box" }}>
                 <ListGroup >
                     {files.map((file, index) => {
                         return (
                             <ListGroup.Item key={index} action 
-                                className={`${file.name === select.file?.name ? "bg-primary" : "bg-transparent"} mb-1 text-white`} onClick={onFileSelect(file)}>
-                                {file.name}
+                                className={`${file.name === select.get?.name ? "bg-primary" : "bg-transparent"} mb-1 text-white`} 
+                                onClick={onFileSelect(file)}>
+                                    <b className="d-flex align-items-center">
+                                        {`${file.name}.${file.type}`}
+                                    </b>
                             </ListGroup.Item>
                         );
                     })}
@@ -102,55 +130,57 @@ function Files() {
 
         function onFileSelect(file: UserFile) {
             return (_: any) => {
-                if(select.file?.name === file.name)
-                    return select.setFile(undefined);
-                select.setFile(file);
+                if(select.get?.name === file.name)
+                    return select.set(undefined);
+                select.set(file);
             }
         }
     }    
 }
 
 function FileIO() {
-    const [mznText, setMznText] = useState<string>("");
-    const [dznText, setDznText] = useState<string>("");
-    const selectedFile = useSelectedFile()!;
+    const [mznText, setMznText] = useState<{name: string, body: string}>({name: "", body: ""});
+    const [dznText, setDznText] = useState<{name: string, body: string}>({name: "", body: ""});
+    const { selected } = useFile()!;
 
     useEffect(() => {
         (async () => {
-            if(selectedFile.mzn) {
-                const mzn = selectedFile.mzn;
+            if(selected.mzn.get) {
+                const mzn = selected.mzn.get;
                 const fileBinary = await getFileBinary(mzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
-                setMznText(fileBinaryText);
-            } else {
-                setMznText("");
+                setMznText({name: mzn.name, body: fileBinaryText});
             }
-            if(selectedFile.dzn) {
-                const dzn = selectedFile.dzn;
+            if(selected.dzn.get) {
+                const dzn = selected.dzn.get;
                 const fileBinary = await getFileBinary(dzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
-                setDznText(fileBinaryText);
-            } else {
-                setDznText("");
+                setDznText({name: dzn.name, body: fileBinaryText});
             }
         })();
-    }, [selectedFile]);
+    }, [selected]);
 
     return (
         <div>
             <Row style={{ height: "44vh" }}>
                 <Form>
                     <Form.Group style={{ height: "100%" }}>
-                        <Form.Control value={mznText} onChange={(event: any) => setMznText(event.target.value)} 
-                            className="bg-transparent h-100 text-white" as="textarea" style={{ resize: "none", border: "none" }} />
+                        {selected.mzn.get ? 
+                            <div className="h-100 text-white" spellCheck="false">
+                                <Form.Control type="text" className="bg-transparent text-white" style={{ border: "none"}} />
+                                <Form.Control value={mznText.body} onChange={(event: any) => setMznText(event.target.value)} 
+                                    className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
+                                    style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
+                            </div> : <></>}
                     </Form.Group>
                 </Form>
             </Row>
             <Row style={{ height: "44vh" }}>
                 <Form>
                     <Form.Group style={{ height: "100%" }}>
-                        <Form.Control value={dznText} onChange={(event: any) => setDznText(event.target.value)} 
-                            className="bg-transparent h-100 text-white" as="textarea" style={{ resize: "none", border: "none" }} />
+                        {selected.dzn.get ? <Form.Control value={dznText.body} onChange={(event: any) => setDznText(event.target.value)} 
+                            className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
+                            style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }} spellCheck="false" /> : <></>}
                     </Form.Group>
                 </Form>
             </Row>

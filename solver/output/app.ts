@@ -75,7 +75,7 @@ const main = async () => {
         const joblist = await batchApi.listNamespacedJob("default");
         joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
             batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
-        })
+        });
 
     } catch(error) {
         console.log(error);
