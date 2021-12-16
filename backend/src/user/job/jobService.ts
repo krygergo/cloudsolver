@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import { Job, JobCollection } from "./jobModel"
+import { Job, JobCollection, Status } from "./jobModel"
 import { v4 as uuid } from "uuid";
-import collection from "../userModel";
 import { getUserById } from "../userService";
 
 export const JobService = (userId: string) => {
     const jobCollection = JobCollection(userId);
 
-    const addJob = async (mznFileId: string, dznFileId: string,memoryMax: number, vCPUMax: number, config: {[key: string]: any} = {}) => {
+    const addJob = async (mznFileId: string, dznFileId: string,memoryMax: number, vCPUMax: number, 
+        config: {[key: string]: any} = {}, solvers: string[], status: Status = "RUNNING") => {
         const jobId = uuid();
         await jobCollection.doc(jobId).set({
             id: jobId,
@@ -15,11 +15,12 @@ export const JobService = (userId: string) => {
             dznFileId: dznFileId,
             config: config,
             result: {
-                status: "PENDING"
+                status: status
             },
             createdAt: Date.now(),
             memoryMax: memoryMax,
-            vCPUMax: vCPUMax
+            vCPUMax: vCPUMax,
+            solvers: solvers
         });
         return jobId;
     }
@@ -31,13 +32,17 @@ export const JobService = (userId: string) => {
     
     const getAvailableMemory = async ()  => {
         const memoryMax = (await getUserById(userId))?.memoryMax!;
-        const remainingMemoryUsage = (await getAllJobs()).reduce((total:number,nextJob:Job)=>total+nextJob.memoryMax,0)
-        return memoryMax - remainingMemoryUsage
+        const remainingMemoryUsage = (await getAllJobs())
+            .filter(job => job.result.status === "RUNNING")
+            .reduce((total:number,nextJob:Job)=>total+nextJob.memoryMax,0);
+        return memoryMax - remainingMemoryUsage;
     }
     const getAvailablevCPU = async ()  => {
         const vCPUMax = (await getUserById(userId))?.vCPUMax!;
-        const remainingvCPUMax = (await getAllJobs()).reduce((total:number,nextJob:Job)=>total+nextJob.vCPUMax,0)
-        return vCPUMax - remainingvCPUMax
+        const remainingvCPUMax = (await getAllJobs())
+            .filter(job => job.result.status === "RUNNING")
+            .reduce((total:number,nextJob:Job)=>total+nextJob.vCPUMax,0);
+        return vCPUMax - remainingvCPUMax;
     } 
 
     const listenOnChange = async (req: Request, res: Response) => {

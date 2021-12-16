@@ -11,6 +11,7 @@ export interface Job {
     finishedAt?: number
     memoryMax: number
     vCPUMax: number
+    solvers: string[]
 }
 
 interface Result {
@@ -19,7 +20,7 @@ interface Result {
     output?: string
 }
 
-type Status = "PENDING" | "FINISHED"
+export type Status = "RUNNING" | "FINISHED" | "QUEUED"
 
 const jobConverter: FirestoreDataConverter<Job> = {
     toFirestore(job: Job) {

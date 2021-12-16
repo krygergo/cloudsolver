@@ -108,8 +108,12 @@ export const SolverService = (userId: string) => {
         if(!solvers.every(solver => images.includes(solver)))
             return undefined;
         try {
-            const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config);
-            solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver,memoryMax,vCPUMax)));
+            if(memoryMax > await jobService.getAvailableMemory() && vCPUMax > await jobService.getAvailablevCPU()) {
+                jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config, solvers, "QUEUED");
+            } else {
+                const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config, solvers);
+                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver,memoryMax,vCPUMax)));
+            }
             return true;
         } catch(error) {
             console.log(error);

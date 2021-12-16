@@ -1,8 +1,8 @@
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Row, Col, ListGroup, Form, Button } from 'react-bootstrap';
 import { UserFile } from '../user/file/FileModel';
-import { getFileBinary, getFileByNameListen, getFiles, postFile } from '../user/file/fileService';
-import FileProvider, { FileSelect, useFile } from './FileContext';
+import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile } from '../user/file/fileService';
+import FileProvider, { FileSelect, SetUserFile, useFile } from './FileContext';
 
 export interface Job {
     id: string
@@ -139,9 +139,10 @@ function Files() {
 }
 
 function FileIO() {
-    const [mznText, setMznText] = useState<{name: string, body: string}>({name: "", body: ""});
-    const [dznText, setDznText] = useState<{name: string, body: string}>({name: "", body: ""});
-    const { selected } = useFile()!;
+    const emptyText = {name: "", body: ""};
+    const [mznText, setMznText] = useState<{name: string, body: string}>(emptyText);
+    const [dznText, setDznText] = useState<{name: string, body: string}>(emptyText);
+    const { selected, files, setFiles } = useFile()!;
 
     useEffect(() => {
         (async () => {
@@ -150,15 +151,41 @@ function FileIO() {
                 const fileBinary = await getFileBinary(mzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
                 setMznText({name: mzn.name, body: fileBinaryText});
+            } else {
+                setMznText(emptyText);
             }
             if(selected.dzn.get) {
                 const dzn = selected.dzn.get;
                 const fileBinary = await getFileBinary(dzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
                 setDznText({name: dzn.name, body: fileBinaryText});
+            } else {
+                setDznText(emptyText);
             }
         })();
     }, [selected]);
+
+    function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
+        
+    }
+
+    function deleteMzn() {
+        const mzn = selected.mzn;
+        deleteFile(mzn.get?.id!);
+        setFiles(files.filter(file => file.id !== mzn.get?.id!));
+        mzn.set(undefined);
+    }
+
+    function updateDzn() {
+
+    }
+
+    function deleteDzn() {
+        const dzn = selected.dzn;
+        deleteFile(dzn.get?.id!);
+        setFiles(files.filter(file => file.id !== dzn.get?.id!));
+        dzn.set(undefined);
+    }
 
     return (
         <div>
@@ -167,10 +194,21 @@ function FileIO() {
                     <Form.Group style={{ height: "100%" }}>
                         {selected.mzn.get ? 
                             <div className="h-100 text-white" spellCheck="false">
-                                <Form.Control type="text" className="bg-transparent text-white" style={{ border: "none"}} />
-                                <Form.Control value={mznText.body} onChange={(event: any) => setMznText(event.target.value)} 
-                                    className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
-                                    style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
+                                <Form.Control value={mznText.name} onChange={event => setMznText({name: event.target.value, body: mznText.body})} 
+                                    type="text" className="bg-transparent text-white" style={{ height: "10%", border: "none"}} />
+                                <div style={{ height: "90%", position: "relative" }}>
+                                    <Form.Control value={mznText.body} onChange={event => setMznText({name: mznText.name, body: event.target.value})} 
+                                        className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
+                                        style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
+                                    <div className="d-flex flex-column" style={{ bottom: "3%", right: "2%", position: "absolute" }}>
+                                        <Button className="mb-1" size="sm" variant="info" onClick={updateMzn}>
+                                            UPDATE
+                                        </Button>
+                                        <Button size="sm" variant="danger" onClick={deleteMzn}>
+                                            DELETE
+                                        </Button>
+                                    </div>
+                                </div>
                             </div> : <></>}
                     </Form.Group>
                 </Form>
@@ -178,9 +216,24 @@ function FileIO() {
             <Row style={{ height: "44vh" }}>
                 <Form>
                     <Form.Group style={{ height: "100%" }}>
-                        {selected.dzn.get ? <Form.Control value={dznText.body} onChange={(event: any) => setDznText(event.target.value)} 
-                            className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
-                            style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }} spellCheck="false" /> : <></>}
+                        {selected.dzn.get ? 
+                            <div className="h-100 text-white" spellCheck="false">
+                                <Form.Control value={dznText.name} onChange={event => setDznText({name: event.target.value, body: dznText.body})} 
+                                    type="text" className="bg-transparent text-white" style={{ height: "10%", border: "none"}} />
+                                <div style={{ height: "90%", position: "relative" }}>
+                                    <Form.Control value={dznText.body} onChange={event => setDznText({name: dznText.name, body: event.target.value})} 
+                                        className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
+                                        style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
+                                    <div className="d-flex flex-column" style={{ bottom: "3%", right: "2%", position: "absolute" }}>
+                                        <Button className="mb-1" size="sm" variant="info" onClick={updateDzn}>
+                                            UPDATE
+                                        </Button>
+                                        <Button size="sm" variant="danger" onClick={deleteDzn}>
+                                            DELETE
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div> : <></>}
                     </Form.Group>
                 </Form>
             </Row>

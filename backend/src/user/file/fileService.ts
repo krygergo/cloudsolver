@@ -12,7 +12,7 @@ export const FileService = (userId: string) => {
     const fileCollection = FileCollection(userId);
 
     const addFile = async (uploadedFile: UploadedFile) => {
-        const fileSnapshot = await fileCollection.where("name", "==", uploadedFile.name).get();
+        const fileSnapshot = await fileCollection.where("name", "==", uploadedFile.name.slice(uploadedFile.name.length - 4)).get();
         if(!fileSnapshot.empty)
             return undefined;
         const batch = firestore.batch();
