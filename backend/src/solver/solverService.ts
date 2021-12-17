@@ -2,6 +2,7 @@ import { V1Job } from "@kubernetes/client-node";
 import k8s from "../config/kubernetes";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { JobService } from "../user/job/jobService";
+import { FileService } from "../user/file/fileService";
 
 const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
@@ -38,10 +39,10 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                 }, {
                     name: "minizinc",
                     image: `eu.gcr.io/cloudsolver-334113/${solver}`,
-                    resources:{
-                        limits:{
-                            memory:`${memoryMax}`+`Mi`,
-                            cpu: `${vCPUMax}`+`m`
+                    resources: {
+                        limits: {
+                            memory:`${memoryMax}Mi`,
+                            cpu: `${vCPUMax}m`
                         }
                     }
                     ,
@@ -101,18 +102,23 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
 
 export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
+    const fileService = FileService(userId);
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
     const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], memoryMax: number, vCPUMax: number, config?: {[key: string]: any}) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
             return undefined;
+        if(!await fileService.fileById(mznFileId).get())
+            return undefined;
+        if(!await fileService.fileById(dznFileId).get())
+            return undefined
         try {
             if(memoryMax > await jobService.getAvailableMemory() && vCPUMax > await jobService.getAvailablevCPU()) {
-                jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config, solvers, "QUEUED");
+                jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, solvers, config, "QUEUED");
             } else {
-                const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, config, solvers);
-                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver, memoryMax, vCPUMax)));
+                const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, solvers, config);
+                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver,memoryMax,vCPUMax)));
             }
             return true;
         } catch(error) {

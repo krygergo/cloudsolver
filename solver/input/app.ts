@@ -1,4 +1,4 @@
-import { writeFile } from "fs";
+import { writeFileSync } from "fs";
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 
 const fileBinaryConverter: FirestoreDataConverter<FileBinary> = {
@@ -85,15 +85,9 @@ const main = async () => {
     
     const dznFileBinary = dznFileBinarySnapshot.data()!;
 
-    writeFile("/shared/mznFile.mzn", mznFileBinary.binary, (error) => {
-        if(error)
-            throw error;
-    });
+    writeFileSync("/shared/mznFile.mzn", mznFileBinary.binary);
 
-    writeFile("/shared/dznFile.dzn", dznFileBinary.binary, (error) => {
-        if(error)
-            throw error;
-    });
+    writeFileSync("/shared/dznFile.dzn", dznFileBinary.binary);
 
     const config = JSON.stringify({
         ...job.config,
@@ -101,10 +95,7 @@ const main = async () => {
         "output-to-file": "/shared/result.txt"
     });
 
-    writeFile("/shared/config.mpc", config, (error) => {
-        if(error)
-            throw error;
-    });
+    writeFileSync("/shared/config.mpc", config);
 
 }
 

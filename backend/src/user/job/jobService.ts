@@ -6,8 +6,8 @@ import { getUserById } from "../userService";
 export const JobService = (userId: string) => {
     const jobCollection = JobCollection(userId);
 
-    const addJob = async (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, 
-        config: {[key: string]: any} = {}, solvers: string[], status: Status = "RUNNING") => {
+    const addJob = async (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, solvers: string[],
+        config: {[key: string]: any} = {}, status: Status = "RUNNING") => {
         const jobId = uuid();
         await jobCollection.doc(jobId).set({
             id: jobId,
