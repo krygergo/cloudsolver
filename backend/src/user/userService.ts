@@ -6,7 +6,7 @@ import k8s from "../config/kubernetes"
 
 export async function addUser(username: string, password: string, userRight: UserRight = "DEFAULT") {
     const userSnapshot = await collection().where("username", "==", username).get();
-    if(!userSnapshot.empty)
+    if (!userSnapshot.empty)
         return undefined;
     const userId = uuid();
     collection().doc(userId).set({
@@ -25,7 +25,7 @@ export const getUserById = async (id: string) => (await collection().doc(id).get
 
 export const getUserByUsername = async (username: string) => {
     const userSnapshot = await collection().where("username", "==", username).get();
-    if(userSnapshot.empty)
+    if (userSnapshot.empty)
         return undefined;
     return userSnapshot.docs[0].data();
 }
@@ -37,10 +37,10 @@ export const deleteUserById = async (userId: string) => {
         return undefined;
 
     // Delete the users active Jobs
-    const pendingJobs = await JobService(userId).getAllQueuedAndRunningJobs();
+    const activeJobs = await JobService(userId).getAllActiveJobs();
     const allJobs = await k8s().batchApi.listNamespacedJob("default");
 
-    pendingJobs.forEach(pj => {
+    activeJobs.forEach(pj => {
         allJobs.body.items.forEach(j => {
             if (j.metadata?.name?.startsWith(pj.id))
                 k8s().batchApi.deleteNamespacedJob(j.metadata.name, "default", undefined, undefined, undefined, undefined, "Background");
@@ -51,7 +51,7 @@ export const deleteUserById = async (userId: string) => {
     collection().doc(userId).delete();
 }
 
-export const verifyUserAdminRight = async (userId: string) => { 
+export const verifyUserAdminRight = async (userId: string) => {
     const user = await getUserById(userId);
     if (!user)
         return undefined;
@@ -60,14 +60,21 @@ export const verifyUserAdminRight = async (userId: string) => {
 
 export const updateUserResourcesById = async (userId: string, vCPUMax?: number, memoryMax?: number) => {
     const updateObject = (vCPUMax?: number, memoryMax?: number) => vCPUMax && memoryMax
-        ? {vCPUMax: vCPUMax, memoryMax: memoryMax} : vCPUMax
-        ? {vCPUMax: vCPUMax} : {memoryMax: memoryMax!}
-    try{
+        ? { vCPUMax: vCPUMax, memoryMax: memoryMax } : vCPUMax
+            ? { vCPUMax: vCPUMax } : { memoryMax: memoryMax! }
+    try {
         await collection().doc(userId).update(updateObject(vCPUMax, memoryMax));
         return true;
     }
-    catch(error){
+    catch (error) {
         console.log(error);
         return false;
     }
+}
+
+export const deleteUserJob = async (userId: string, jobId: string) => {
+    const allJobs = await k8s().batchApi.listNamespacedJob("default");
+    allJobs.body.items.filter(job => job.metadata?.name?.startsWith(jobId))
+        .forEach(job => k8s().batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background"));
+    JobService(userId).deleteJob(jobId);
 }

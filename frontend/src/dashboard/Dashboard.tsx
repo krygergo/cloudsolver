@@ -1,7 +1,7 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState, useRef } from 'react'
 import { Row, Col, ListGroup, Form, Button } from 'react-bootstrap';
 import { UserFile } from '../user/file/FileModel';
-import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile } from '../user/file/fileService';
+import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile, putFileBinary, putFileName } from '../user/file/fileService';
 import FileProvider, { FileSelect, SetUserFile, useFile } from './FileContext';
 
 export interface Job {
@@ -165,8 +165,16 @@ function FileIO() {
         })();
     }, [selected]);
 
-    function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
-        
+    async function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
+        event.preventDefault();
+
+        putFileBinary(selected.mzn.get?.id!, Buffer.from(mznText.body));
+        if(mznText.name !== selected.mzn.get?.name) {
+            putFileName(selected.mzn.get?.id!, mznText.name);
+            const newFile = { ...selected.mzn.get!, name: mznText.name };
+            setFiles(files.map(file => file.name !== selected.mzn.get?.name ? file : newFile));
+            selected.mzn.set(newFile);
+        }
     }
 
     function deleteMzn() {
@@ -177,7 +185,12 @@ function FileIO() {
     }
 
     function updateDzn() {
-
+        putFileBinary(selected.dzn.get?.id!, Buffer.from(dznText.body));
+        if(dznText.name !== selected.dzn.get?.name) {
+            putFileName(selected.dzn.get?.id!, dznText.name);
+            setFiles(files.map(file => file.name !== selected.dzn.get?.name ? file : { ...file, name: dznText.name }));
+        }
+            
     }
 
     function deleteDzn() {

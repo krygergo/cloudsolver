@@ -1,6 +1,7 @@
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot, Transaction } from "@google-cloud/firestore";
 import { readFileSync } from "fs";
 import { KubeConfig, BatchV1Api, V1Job } from "@kubernetes/client-node";
+import { exit } from "process";
 
 const config = new KubeConfig();
 config.loadFromDefault();
@@ -71,60 +72,61 @@ const main = async () => {
 
     const jobReference = jobCollection.doc(jobId);
 
-    try {
-        const outputTransaction = await firestore.runTransaction(async transaction => {
-            const jobSnapshot = await transaction.get(jobReference);
+    const outputTransaction = await firestore.runTransaction(async transaction => {
+        const jobSnapshot = await transaction.get(jobReference);
 
-            if(!jobSnapshot.exists)
-                return Promise.reject("Job do not exists");
+        if(!jobSnapshot.exists)
+            return "Job do not exists";
                 
-            const job = jobSnapshot.data()!;
+        const job = jobSnapshot.data()!;
 
-            if(job.status === "FINISHED")
-                return Promise.reject("The job is allready handled");
+        if(job.status === "FINISHED")
+            return "The job is allready handled";
                 
-            const data = readFileSync("/shared/result.txt");
+        const data = readFileSync("/shared/result.txt");
 
-            transaction.update(jobReference, {
-                finishedAt: Date.now(),
-                status: "FINISHED",
-                result: {
-                    solver: solver,
-                    output: Buffer.from(data).toString()
-                } 
-            });
-            return Promise.resolve("Success");
+        transaction.update(jobReference, {
+            finishedAt: Date.now(),
+            status: "FINISHED",
+            result: {
+                solver: solver,
+                output: Buffer.from(data).toString()
+            } 
         });
+        return "Success";
+    });
 
-        if(outputTransaction !== "Success")
-            return;
-            
-        const joblist = await batchApi.listNamespacedJob("default");
-        joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
-            batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
-        });
+    if(outputTransaction !== "Success")
+        return;
 
-        const runningJobs = (await jobCollection.where("status", "==", "RUNNING").get()).docs.map(job => job.data());
-        const queuedJobs = (await jobCollection.where("status", "==", "QUEUED").get()).docs.map(job => job.data());
-        const jobs = runningJobs.concat(queuedJobs);
-        if(jobs.length === 0)
-            return;
-        const user = (await userDocument.withConverter(userConverter).get()).data()!;
-        let availableMemory = user?.memoryMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
-        let availablevCPU = user?.vCPUMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
-            
-        while(queuedJobs.length > 0) {
-            const job = queuedJobs.shift()!;
-            if(job.memoryMax <= availableMemory && job.vCPUMax <= availablevCPU) {
-                job.solvers.forEach(solver => batchApi.createNamespacedJob("default", solverPodJob(userId, job.id, solver, job.memoryMax, job.vCPUMax)));
-                availablevCPU += job.vCPUMax;
-                availableMemory += job.memoryMax;
-            } else {
-                break;
-            }
+    const joblist = await batchApi.listNamespacedJob("default");
+    joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
+        batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
+    });
+        
+    const runningJobs = (await jobCollection.where("status", "==", "RUNNING").get()).docs.map(job => job.data());
+    const queuedJobs = (await jobCollection.where("status", "==", "QUEUED").get()).docs.map(job => job.data()).sort((aJob, bJob) => aJob.createdAt - bJob.createdAt);
+    const jobs = runningJobs.concat(queuedJobs);
+    if(jobs.length === 0)
+        return;
+    const user = (await userDocument.withConverter(userConverter).get()).data()!;
+    let availableMemory = user?.memoryMax! - runningJobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
+    let availablevCPU = user?.vCPUMax! - runningJobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
+
+    while(queuedJobs.length > 0) {
+        const job = queuedJobs.pop()!;
+        if(job.memoryMax <= availableMemory && job.vCPUMax <= availablevCPU) {
+            jobCollection.doc(job.id).update({
+                status: "RUNNING"
+            })
+            job.solvers.forEach(solver => batchApi.createNamespacedJob("default", solverPodJob(
+                userId, job.id, solver, job.memoryMax / job.solvers.length, job.vCPUMax / job.solvers.length
+            )));
+            availablevCPU -= job.vCPUMax;
+            availableMemory -= job.memoryMax;
+        } else {
+            break;
         }
-    } catch(error) {
-        console.log(error);
     }
 }
 
@@ -165,13 +167,12 @@ const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: n
                 }, {
                     name: "minizinc",
                     image: `eu.gcr.io/cloudsolver-334113/${solver}`,
-                    resources:{
-                        limits:{
-                            memory:`${memoryMax}`+`Mi`,
-                            cpu: `${vCPUMax}`+`m`
+                    resources: {
+                        limits: {
+                            memory:`${memoryMax}Mi`,
+                            cpu: `${vCPUMax}m`
                         }
-                    }
-                    ,
+                    },
                     command: [
                         "minizinc"
                     ],

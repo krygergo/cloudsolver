@@ -66,7 +66,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
         res.sendStatus(200);        
     });
 
-    route.put("/name/:fileId", async (req, res) =>{
+    route.put("/name/:fileId", async (req, res) => {
         if(!req.query.name)
             return res.status(400).send("No query parameter name specified.");
         if(!await fileService.fileById(req.params.fileId).updateFileName(req.query.name as string))

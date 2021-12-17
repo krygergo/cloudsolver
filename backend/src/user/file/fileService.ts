@@ -54,13 +54,19 @@ export const FileService = (userId: string) => {
                 binary: binary
             });
             batch.update(document, {
-                size: binary.length,
+                size: binary.toString().length,
                 updatedAt: Date.now() 
             });
             return batch.commit();
         }
 
-        const updateFileName = async (name: string) => document.update({ name: name });
+        const updateFileName = async (name: string) => {
+            const allFiles = await getAllFiles();
+            const filtered = allFiles.filter(f => f.name === name);
+            if (filtered.length > 0)
+                return undefined;
+            return document.update({ name: name });
+        }
 
         const deleteFile = async () => {
             const file = await getFile();
