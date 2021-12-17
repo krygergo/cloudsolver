@@ -203,28 +203,24 @@ function FileIO() {
     return (
         <div>
             <Row style={{ height: "44vh" }}>
-                <Form>
-                    <Form.Group style={{ height: "100%" }}>
-                        {selected.mzn.get ? 
-                            <div className="h-100 text-white" spellCheck="false">
-                                <Form.Control value={mznText.name} onChange={event => setMznText({name: event.target.value, body: mznText.body})} 
-                                    type="text" className="bg-transparent text-white" style={{ height: "10%", border: "none"}} />
-                                <div style={{ height: "90%", position: "relative" }}>
-                                    <Form.Control value={mznText.body} onChange={event => setMznText({name: mznText.name, body: event.target.value})} 
-                                        className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
-                                        style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
-                                    <div className="d-flex flex-column" style={{ bottom: "3%", right: "2%", position: "absolute" }}>
-                                        <Button className="mb-1" size="sm" variant="info" onClick={updateMzn}>
-                                            UPDATE
-                                        </Button>
-                                        <Button size="sm" variant="danger" onClick={deleteMzn}>
-                                            DELETE
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div> : <></>}
-                    </Form.Group>
-                </Form>
+                {selected.mzn.get ? 
+                    <div className="h-100 text-white" spellCheck="false">
+                        <Form.Control value={mznText.name} onChange={event => setMznText({name: event.target.value, body: mznText.body})} 
+                            type="text" className="bg-transparent text-white" style={{ height: "10%", border: "none"}} />
+                        <div style={{ height: "90%", position: "relative" }}>
+                            <Form.Control value={mznText.body} onChange={event => setMznText({name: mznText.name, body: event.target.value})} 
+                                className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
+                                style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
+                            <div className="d-flex flex-column" style={{ bottom: "3%", right: "2%", position: "absolute" }}>
+                                <Button className="mb-1" size="sm" variant="info" onClick={updateMzn}>
+                                    UPDATE
+                                </Button>
+                                <Button size="sm" variant="danger" onClick={deleteMzn}>
+                                    DELETE
+                                </Button>
+                            </div>
+                        </div>
+                    </div> : <></>}
             </Row>
             <Row style={{ height: "44vh" }}>
                 <Form>
