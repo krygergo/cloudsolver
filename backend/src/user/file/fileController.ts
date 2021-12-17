@@ -60,23 +60,23 @@ export default (req: Request, res: Response, next: NextFunction) => {
 
     route.put("/binary/:fileId", async (req, res) => {
         if(!req.body.binary)
-            return res.status(400).send("No binary data provided");
+            return res.status(400).send("No binary data provided.");
         if(!await fileService.fileById(req.params.fileId).updateFileData(req.body.binary))
-            return res.status(400).send("File do not exists");
+            return res.status(400).send("File does not exist.");
         res.sendStatus(200);        
     });
 
     route.put("/name/:fileId", async (req, res) =>{
         if(!req.query.name)
-            return res.status(400).send("No query parameter name specified");
+            return res.status(400).send("No query parameter name specified.");
         if(!await fileService.fileById(req.params.fileId).updateFileName(req.query.name as string))
-            return res.status(400).send("File do not exists");
+            return res.status(400).send("File ID does not exist, or the file name already is taken.");
         res.sendStatus(200);
     });
 
     route.delete("/:filedId", async (req, res) => {
         if(!await fileService.fileById(req.params.filedId).deleteFile())
-            return res.status(400).send("Unable to delete");
+            return res.status(400).send("Unable to delete.");
         res.sendStatus(200);
     })
 
