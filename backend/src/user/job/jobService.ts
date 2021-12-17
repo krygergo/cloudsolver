@@ -47,6 +47,8 @@ export const JobService = (userId: string) => {
         });
     }
 
+    const deleteJob = (jobId: string) => jobCollection.doc(jobId).delete();
+
     const withTransactions = (transaction: Transaction) => {
         
         const addJob = (job: Job) => transaction.create(jobCollection.doc(job.id), job);
@@ -67,6 +69,7 @@ export const JobService = (userId: string) => {
         getAllJobs,
         listenOnChange,
         getAllActiveJobs,
-        withTransactions
+        withTransactions,
+        deleteJob
     }
 }
