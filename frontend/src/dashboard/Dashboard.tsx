@@ -41,6 +41,7 @@ export default function Dashboard() {
                     <FileIO/>
                 </Col>
                 <Col>
+                    <Job/>
                 </Col>
             </FileProvider>
         </div>
@@ -163,8 +164,10 @@ function FileIO() {
                 const fileBinary = await getFileBinary(dzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
                 setDznText({name: dzn.name, body: fileBinaryText});
-            } else {
+            } else if(!selected.mzn.get && shouldFetch) {
                 setDznText(emptyText);
+            } else {
+                setShouldFetch(true);
             }
         })();
     }, [selected, setShouldFetch]);
@@ -206,7 +209,7 @@ function FileIO() {
     }
 
     return (
-        <div>
+        <>
             <Row style={{ height: "44vh" }}>
                 {selected.mzn.get ? 
                     <div className="h-100 text-white" spellCheck="false">
@@ -228,29 +231,34 @@ function FileIO() {
                     </div> : <></>}
             </Row>
             <Row style={{ height: "44vh" }}>
-                <Form>
-                    <Form.Group style={{ height: "100%" }}>
-                        {selected.dzn.get ? 
-                            <div className="h-100 text-white" spellCheck="false">
-                                <Form.Control value={dznText.name} onChange={event => setDznText({name: event.target.value, body: dznText.body})} 
-                                    type="text" className="bg-transparent text-white" style={{ height: "10%", border: "none"}} />
-                                <div style={{ height: "90%", position: "relative" }}>
-                                    <Form.Control value={dznText.body} onChange={event => setDznText({name: dznText.name, body: event.target.value})} 
-                                        className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
-                                        style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
-                                    <div className="d-flex flex-column" style={{ bottom: "3%", right: "2%", position: "absolute" }}>
-                                        <Button className="mb-1" size="sm" variant="info" onClick={updateDzn}>
-                                            UPDATE
-                                        </Button>
-                                        <Button size="sm" variant="danger" onClick={deleteDzn}>
-                                            DELETE
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div> : <></>}
-                    </Form.Group>
-                </Form>
+                {selected.dzn.get ? 
+                    <div className="h-100 text-white" spellCheck="false">
+                        <Form.Control value={dznText.name} onChange={event => setDznText({name: event.target.value, body: dznText.body})} 
+                            type="text" className="bg-transparent text-white" style={{ height: "10%", border: "none"}} />
+                        <div style={{ height: "90%", position: "relative" }}>
+                            <Form.Control value={dznText.body} onChange={event => setDznText({name: dznText.name, body: event.target.value})} 
+                                className="bg-transparent h-100 text-white scrollbar scrollbar-primary" as="textarea" 
+                                style={{ resize: "none", border: "none", whiteSpace: "pre", cursor: "auto" }}/>
+                            <div className="d-flex flex-column" style={{ bottom: "3%", right: "2%", position: "absolute" }}>
+                                <Button className="mb-1" size="sm" variant="info" onClick={updateDzn}>
+                                    UPDATE
+                                </Button>
+                                <Button size="sm" variant="danger" onClick={deleteDzn}>
+                                    DELETE
+                                </Button>
+                            </div>
+                        </div>
+                    </div> : <></>}
             </Row>
-        </div>
+        </>
     ); 
+}
+
+function Job() {
+
+    return (
+        <div>
+            JOB
+        </div>
+    )
 }
