@@ -30,22 +30,20 @@ export const JobService = (userId: string) => {
         return jobSnapshot.docs.map((job) => job.data());
     }
 
-    const getAllPendingJobs = async () => {
-        return (await getAllJobs()).filter(job => job.result.status !== "FINISHED");
+    const getAllRunningJobs = async () => {
+        return (await jobCollection.where("result.status", "==", "RUNNING").get()).docs.map(job => job.data());
     }
     
     const getAvailableMemory = async ()  => {
         const memoryMax = (await getUserById(userId))?.memoryMax!;
-        const remainingMemoryUsage = (await getAllJobs())
-            .filter(job => job.result.status === "RUNNING")
-            .reduce((total:number,nextJob:Job) => total + nextJob.memoryMax, 0);
+        const remainingMemoryUsage = (await getAllRunningJobs())
+            .reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
         return memoryMax - remainingMemoryUsage;
     }
     const getAvailablevCPU = async ()  => {
         const vCPUMax = (await getUserById(userId))?.vCPUMax!;
-        const remainingvCPUMax = (await getAllJobs())
-            .filter(job => job.result.status === "RUNNING")
-            .reduce((total:number,nextJob:Job) => total + nextJob.vCPUMax, 0);
+        const remainingvCPUMax = (await getAllRunningJobs())
+            .reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
         return vCPUMax - remainingvCPUMax;
     } 
 
@@ -71,6 +69,6 @@ export const JobService = (userId: string) => {
         listenOnChange,
         getAvailableMemory,
         getAvailablevCPU,
-        getAllPendingJobs
+        getAllRunningJobs
     }
 }

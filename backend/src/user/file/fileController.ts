@@ -32,6 +32,8 @@ export default (req: Request, res: Response, next: NextFunction) => {
 
     route.post("/", fileUpload(defaultFileUploadConfig), verifyMinizincFile, async (_, res) => {
         const file = res.locals.file!;
+        if(file.size === 0)
+            return res.status(400).send("Empty file");
         const write = await fileService.addFile(file);
         if(!write)
             return res.status(403).send("File allready exists");

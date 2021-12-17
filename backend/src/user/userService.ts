@@ -37,7 +37,7 @@ export const deleteUserById = async (userId: string) => {
         return undefined;
 
     // Delete the users active Jobs
-    const pendingJobs = await JobService(userId).getAllPendingJobs();
+    const pendingJobs = await JobService(userId).getAllRunningJobs();
     const allJobs = await k8s().batchApi.listNamespacedJob("default");
 
     pendingJobs.forEach(pj => {
@@ -58,16 +58,12 @@ export const verifyUserAdminRight = async (userId: string) => {
     return isAdmin(user.userRight);
 }
 
-export const updateUserResourcesById = async (userId: string, vCPUMax?: number, memoryMax?: number) => {  
-    const user = await getUserById(userId);
-    if(!user)
-        return false;
-
+export const updateUserResourcesById = async (userId: string, vCPUMax?: number, memoryMax?: number) => {
+    const updateObject = (vCPUMax?: number, memoryMax?: number) => vCPUMax && memoryMax
+        ? {vCPUMax: vCPUMax, memoryMax: memoryMax} : vCPUMax
+        ? {vCPUMax: vCPUMax} : {memoryMax: memoryMax!}
     try{
-        const _vCPUMax = vCPUMax ? vCPUMax : user.vCPUMax;
-        const _memoryMax = memoryMax ? memoryMax : user.memoryMax;
-
-        await collection().doc(userId).update({vCPUMax: _vCPUMax, memoryMax: _memoryMax});
+        await collection().doc(userId).update(updateObject(vCPUMax, memoryMax));
         return true;
     }
     catch(error){

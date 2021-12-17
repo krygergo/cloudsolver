@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { SolverService } from "./solverService";
 import { JobService } from "../user/job/jobService";
+import { getUserById } from "../user/userService";
 
 
 const route = Router();
@@ -25,16 +26,12 @@ route.post("/", async (req, res) => {
         return res.status(400).send("No solvers");
     if(!Array.isArray(body.solvers))
         return res.status(400).send("Solvers field must be of type array");
-    const jobService = JobService(req.session.userId!);
-    const currentmemoryMax = req.body.memoryMax ? req.body.memoryMax : await jobService.getAvailableMemory()
-    const currentvCPUMax = req.body.vCPUMax ? req.body.vCPUMax : await jobService.getAvailablevCPU()
-    if (currentmemoryMax > await JobService(req.session.userId!).getAvailableMemory())
-        return res.status(400).send("Memory capacity exceeded"); 
-    if (currentvCPUMax > await JobService(req.session.userId!).getAvailablevCPU())
-        return res.status(400).send("vCPU capacity exceeded");
-    if(!(await SolverService(req.session.userId!).startSolverJob(body.mznFileId, body.dznFileId, body.solvers, currentmemoryMax, currentvCPUMax, body.config)))
-        return res.status(400).send("Error in request body");
-    res.sendStatus(200);
+    const solverJob = (await SolverService(req.session.userId!).startSolverJob(
+        body.mznFileId, body.dznFileId, body.solvers, body.memoryMax, body.vCPUMax, body.config
+    ));
+    if(solverJob.code !== 0)
+        return res.status(400).send(solverJob.message);
+    res.status(200).send(solverJob.message);
 });
 
 route.get("/job", async (req, res) => {

@@ -3,6 +3,8 @@ import k8s from "../config/kubernetes";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { JobService } from "../user/job/jobService";
 import { FileService } from "../user/file/fileService";
+import { getUserById } from "../user/userService";
+import { User } from "../user/userModel";
 
 const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
@@ -105,24 +107,32 @@ export const SolverService = (userId: string) => {
     const fileService = FileService(userId);
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
-    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], memoryMax: number, vCPUMax: number, config?: {[key: string]: any}) => {
+    const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], 
+        memoryMax?: number, vCPUMax?: number, config?: {[key: string]: any}) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
-            return undefined;
+            return {code: 6, message: "One of the solvers specified is not supported"};
         if(!await fileService.fileById(mznFileId).get())
-            return undefined;
+            return {code: 5, message: "mznFile doesn't exist"};
         if(!await fileService.fileById(dznFileId).get())
-            return undefined
+            return {code: 4, message: "dznFile doesn't exist"};
         try {
-            if(memoryMax > await jobService.getAvailableMemory() && vCPUMax > await jobService.getAvailablevCPU()) {
-                jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, solvers, config, "QUEUED");
+            const user = await getUserById(userId);
+            const memoryUsage = memoryMax ? memoryMax : user?.memoryMax!;
+            if(memoryUsage > user?.memoryMax!)
+                return {code: 3, message: "Memory specified exceeds users maximum"};
+            const vCPUUsage = vCPUMax ? vCPUMax : user?.vCPUMax!;
+            if(vCPUUsage > user?.memoryMax!)
+                return {code: 2, message: "CPU spceficied exceeds users maximum"};
+            if(memoryUsage > await jobService.getAvailableMemory() || vCPUUsage > await jobService.getAvailablevCPU()) {
+                jobService.addJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config, "QUEUED");
             } else {
-                const jobId = await jobService.addJob(mznFileId, dznFileId, memoryMax, vCPUMax, solvers, config);
-                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver,memoryMax,vCPUMax)));
+                const jobId = await jobService.addJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config);
+                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver, memoryUsage, vCPUUsage)));
             }
-            return true;
+            return {code: 0, message: "Successfully started job"};
         } catch(error) {
-            console.log(error);
+            return {code: 1, message: "Error starting job"};
         }
     }
 
