@@ -16,7 +16,7 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 route.use(verifyAdmin);
 
 route.delete("/user/:userId", auth, (req, res) => {
-    deleteUserById(req.session.userId!);
+    deleteUserById(req.params.userId);
     res.sendStatus(200);
 });
 

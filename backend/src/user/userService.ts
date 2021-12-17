@@ -1,6 +1,8 @@
 import bcrypt from "bcrypt";
 import collection, { isAdmin, UserRight } from "./userModel";
 import { v4 as uuid } from "uuid";
+import { JobService } from "./job/jobService";
+import k8s from "../config/kubernetes"
 
 export async function addUser(username: string, password: string, userRight: UserRight = "DEFAULT") {
     const userSnapshot = await collection().where("username", "==", username).get();
@@ -30,7 +32,24 @@ export const getUserByUsername = async (username: string) => {
 
 export const verifyUserPassword = (password: string, hashedPassword: string) => bcrypt.compare(password, hashedPassword);
 
-export const deleteUserById = (userId: string) => collection().doc(userId).delete();
+export const deleteUserById = async (userId: string) => {
+    if (!await getUserById(userId))
+        return undefined;
+
+    // Delete the users active Jobs
+    const pendingJobs = await JobService(userId).getAllPendingJobs();
+    const allJobs = await k8s().batchApi.listNamespacedJob("default");
+
+    pendingJobs.forEach(pj => {
+        allJobs.body.items.forEach(j => {
+            if (j.metadata?.name?.startsWith(pj.id))
+                k8s().batchApi.deleteNamespacedJob(j.metadata.name, "default", undefined, undefined, undefined, undefined, "Background");
+        });
+    })
+
+    // Delete all material related to user
+    collection().doc(userId).delete();
+}
 
 export const verifyUserAdminRight = async (userId: string) => { 
     const user = await getUserById(userId);

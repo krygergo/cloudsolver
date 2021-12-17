@@ -29,6 +29,10 @@ export const JobService = (userId: string) => {
         const jobSnapshot = await jobCollection.get();
         return jobSnapshot.docs.map((job) => job.data());
     }
+
+    const getAllPendingJobs = async () => {
+        return (await getAllJobs()).filter(job => job.result.status !== "FINISHED");
+    }
     
     const getAvailableMemory = async ()  => {
         const memoryMax = (await getUserById(userId))?.memoryMax!;
@@ -66,6 +70,7 @@ export const JobService = (userId: string) => {
         getAllJobs,
         listenOnChange,
         getAvailableMemory,
-        getAvailablevCPU
+        getAvailablevCPU,
+        getAllPendingJobs
     }
 }
