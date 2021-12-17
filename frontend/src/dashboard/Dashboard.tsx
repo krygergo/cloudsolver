@@ -1,8 +1,8 @@
-import React, { ChangeEvent, useEffect, useState, useRef } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import { Row, Col, ListGroup, Form, Button } from 'react-bootstrap';
 import { UserFile } from '../user/file/FileModel';
 import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile, putFileBinary, putFileName } from '../user/file/fileService';
-import FileProvider, { FileSelect, SetUserFile, useFile } from './FileContext';
+import FileProvider, { FileSelect, useFile } from './FileContext';
 
 export interface Job {
     id: string
@@ -142,19 +142,23 @@ function FileIO() {
     const emptyText = {name: "", body: ""};
     const [mznText, setMznText] = useState<{name: string, body: string}>(emptyText);
     const [dznText, setDznText] = useState<{name: string, body: string}>(emptyText);
+    const [shouldFetch, setShouldFetch] = useState(true);
     const { selected, files, setFiles } = useFile()!;
 
     useEffect(() => {
+        const emptyText = {name: "", body: ""};
         (async () => {
-            if(selected.mzn.get) {
+            if(selected.mzn.get && shouldFetch) {
                 const mzn = selected.mzn.get;
                 const fileBinary = await getFileBinary(mzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
                 setMznText({name: mzn.name, body: fileBinaryText});
-            } else {
+            } else if(!selected.mzn.get && shouldFetch) {
                 setMznText(emptyText);
+            } else {
+                setShouldFetch(true);
             }
-            if(selected.dzn.get) {
+            if(selected.dzn.get && shouldFetch) {
                 const dzn = selected.dzn.get;
                 const fileBinary = await getFileBinary(dzn.fileBinaryId);
                 const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
@@ -163,17 +167,17 @@ function FileIO() {
                 setDznText(emptyText);
             }
         })();
-    }, [selected]);
+    }, [selected, setShouldFetch]);
 
-    async function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
+    function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
         event.preventDefault();
-
         putFileBinary(selected.mzn.get?.id!, Buffer.from(mznText.body));
         if(mznText.name !== selected.mzn.get?.name) {
             putFileName(selected.mzn.get?.id!, mznText.name);
             const newFile = { ...selected.mzn.get!, name: mznText.name };
             setFiles(files.map(file => file.name !== selected.mzn.get?.name ? file : newFile));
             selected.mzn.set(newFile);
+            setShouldFetch(false);
         }
     }
 
@@ -188,9 +192,10 @@ function FileIO() {
         putFileBinary(selected.dzn.get?.id!, Buffer.from(dznText.body));
         if(dznText.name !== selected.dzn.get?.name) {
             putFileName(selected.dzn.get?.id!, dznText.name);
-            setFiles(files.map(file => file.name !== selected.dzn.get?.name ? file : { ...file, name: dznText.name }));
+            const newFile = { ...selected.dzn.get!, name: dznText.name };
+            setFiles(files.map(file => file.name !== selected.dzn.get?.name ? file : newFile));
+            selected.dzn.set(newFile);
         }
-            
     }
 
     function deleteDzn() {
