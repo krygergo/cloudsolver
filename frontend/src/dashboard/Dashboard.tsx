@@ -40,8 +40,20 @@ export default function Dashboard() {
                 <Col className="col-4">
                     <FileIO/>
                 </Col>
+                <Col className="col-2 h-100">
+                    <Row style={{ height: "50vh" }}>
+                        <Col>
+                            <Jobs/>
+                        </Col>
+                    </Row>
+                    <Row className="h-50">
+                        <Col className="h-100">
+                            <SolverConfiguration/>
+                        </Col>
+                    </Row>
+                </Col>
                 <Col>
-                    <Job/>
+                    <JobOutput/>
                 </Col>
             </FileProvider>
         </div>
@@ -254,11 +266,47 @@ function FileIO() {
     ); 
 }
 
-function Job() {
+function Jobs() {
 
     return (
         <div>
             JOB
         </div>
+    );
+}
+
+function JobOutput() {
+
+    return (
+        <div>
+            JobOutput
+        </div>
+    );
+}
+
+function SolverConfiguration() {
+
+    return (
+        <>
+            <Row style={{ height: "40%" }}>
+                <ListGroup style={{ paddingLeft: "12px"}}>
+                    {["chuffed", "gecode", "hello9000"].map(solver => {
+                        return (
+                            <ListGroup.Item action>
+                                {solver}
+                            </ListGroup.Item>
+                        );
+                    })}    
+                </ListGroup>
+            </Row>
+            <Row>
+                <Form>
+                    <Form.Control className="mb-2" type="text" placeholder="vCPU"/>
+                    <Form.Control className="mb-2" type="text" placeholder="memory"/>
+                    <Form.Control className="mb-2" type="text" placeholder="flags"/>
+                    <Button style={{ width: "100%" }}>Submit Job</Button>
+                </Form>
+            </Row>
+        </>
     )
 }
