@@ -27,9 +27,8 @@ export const JobService = (userId: string) => {
         return jobSnapshot.docs.map((job) => job.data());
     }
 
-    const getAllQueuedAndRunningJobs = async () => (await jobCollection
-        .where("status", "==", "RUNNING")
-        .where("status", "==", "QUEUED")
+    const getAllActiveJobs = async () => (await jobCollection
+        .where("status", "!=", "FINISHED")
         .get()).docs.map(job => job.data());
 
     const listenOnChange = async (req: Request, res: Response) => {
@@ -67,7 +66,7 @@ export const JobService = (userId: string) => {
     return {
         getAllJobs,
         listenOnChange,
-        getAllQueuedAndRunningJobs,
+        getAllActiveJobs,
         withTransactions
     }
 }

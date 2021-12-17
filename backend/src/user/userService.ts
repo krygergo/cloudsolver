@@ -37,7 +37,7 @@ export const deleteUserById = async (userId: string) => {
         return undefined;
 
     // Delete the users active Jobs
-    const pendingJobs = await JobService(userId).getAllQueuedAndRunningJobs();
+    const pendingJobs = await JobService(userId).getAllActiveJobs();
     const allJobs = await k8s().batchApi.listNamespacedJob("default");
 
     pendingJobs.forEach(pj => {
