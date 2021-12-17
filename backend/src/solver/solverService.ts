@@ -1,10 +1,11 @@
 import { V1Job } from "@kubernetes/client-node";
 import k8s from "../config/kubernetes";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
-import { JobService } from "../user/job/jobService";
+import { createJob, JobService } from "../user/job/jobService";
 import { FileService } from "../user/file/fileService";
 import { getUserById } from "../user/userService";
-import { User } from "../user/userModel";
+import firestore from "../config/database/googleFirestore";
+import { Job } from "../user/job/jobModel";
 
 const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
@@ -124,12 +125,28 @@ export const SolverService = (userId: string) => {
             const vCPUUsage = vCPUMax ? vCPUMax : user?.vCPUMax!;
             if(vCPUUsage > user?.memoryMax!)
                 return {code: 2, message: "CPU spceficied exceeds users maximum"};
-            if(memoryUsage > await jobService.getAvailableMemory() || vCPUUsage > await jobService.getAvailablevCPU()) {
-                jobService.addJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config, "QUEUED");
-            } else {
-                const jobId = await jobService.addJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config);
-                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver, memoryUsage, vCPUUsage)));
-            }
+
+            const jobId = await firestore().runTransaction(async transacation => {
+                const jobTransactions = jobService.withTransactions(transacation);
+                const jobs = await jobTransactions.queuedAndRunningJobsQuery();
+                const createAndReturnJobId = () => {
+                    const job = createJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config);
+                    jobTransactions.addJob(job);
+                    return job.id;
+                }
+                if(jobs.length === 0)
+                    return createAndReturnJobId();
+                const availableMemory = user?.memoryMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
+                const availablevCPU = user?.vCPUMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
+                if(memoryUsage > availableMemory || vCPUUsage > availablevCPU) {
+                    const job = createJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config, "QUEUED");
+                    jobTransactions.addJob(job);
+                    return undefined;
+                }
+                return createAndReturnJobId();
+            });
+            if(jobId) 
+                solvers.forEach(solver => k8s().batchApi.createNamespacedJob("default", solverPodJob(userId, jobId, solver, memoryUsage / solvers.length, vCPUUsage / solvers.length)));
             return {code: 0, message: "Successfully started job"};
         } catch(error) {
             return {code: 1, message: "Error starting job"};

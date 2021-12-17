@@ -1,4 +1,4 @@
-import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
+import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot, Transaction } from "@google-cloud/firestore";
 import { readFileSync } from "fs";
 import { KubeConfig, BatchV1Api, V1Job } from "@kubernetes/client-node";
 
@@ -41,18 +41,18 @@ interface Job {
     mznFileId: string
     dznFileId: string
     flags: string
-    result: Result
+    result?: Result
     createdAt: number
     finishedAt?: number
     memoryMax: number
     vCPUMax: number
     solvers: string[]
+    status: Status
 }
 
 interface Result {
-    status: Status
-    solver?: string
-    output?: string
+    solver: string
+    output: string
 }
 
 type Status = "RUNNING" | "FINISHED" | "QUEUED"
@@ -72,7 +72,7 @@ const main = async () => {
     const jobReference = jobCollection.doc(jobId);
 
     try {
-        const transaction = await firestore.runTransaction(async transaction => {
+        const outputTransaction = await firestore.runTransaction(async transaction => {
             const jobSnapshot = await transaction.get(jobReference);
 
             if(!jobSnapshot.exists)
@@ -80,15 +80,15 @@ const main = async () => {
                 
             const job = jobSnapshot.data()!;
 
-            if(job.result.status === "FINISHED")
+            if(job.status === "FINISHED")
                 return Promise.reject("The job is allready handled");
                 
             const data = readFileSync("/shared/result.txt");
 
             transaction.update(jobReference, {
                 finishedAt: Date.now(),
+                status: "FINISHED",
                 result: {
-                    status: "FINISHED",
                     solver: solver,
                     output: Buffer.from(data).toString()
                 } 
@@ -96,7 +96,7 @@ const main = async () => {
             return Promise.resolve("Success");
         });
 
-        if(transaction !== "Success")
+        if(outputTransaction !== "Success")
             return;
             
         const joblist = await batchApi.listNamespacedJob("default");
@@ -104,32 +104,20 @@ const main = async () => {
             batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
         });
 
-        const runningAndQueuedjobs = (await jobCollection
-            .where("result.status", "!=", "FINISHED")
-            .get()).docs.map(job => job.data());
-        
-        const queuedJobs = runningAndQueuedjobs.filter(job => job.result.status === "QUEUED");
-        const runningJobs = runningAndQueuedjobs.filter(job => job.result.status === "RUNNING");
-        
-        const getAvailableMemory = async () => {
-            const memoryMax = (await userDocument.withConverter(userConverter).get()).data()?.memoryMax!;
-            const remainingMemoryUsage = runningJobs.reduce((total:number,nextJob:Job)=>total+nextJob.memoryMax,0);
-            return memoryMax - remainingMemoryUsage;
-        }
-        const getAvailablevCPU = async () => {
-            const vCPUMax = (await userDocument.withConverter(userConverter).get()).data()?.vCPUMax!;
-            const remainingvCPUMax = runningJobs.reduce((total:number,nextJob:Job)=>total+nextJob.vCPUMax,0);
-            return vCPUMax - remainingvCPUMax;
-        }
-
-        let availableCpu = await getAvailablevCPU();
-        let availableMemory = await getAvailableMemory();
-
+        const runningJobs = (await jobCollection.where("status", "==", "RUNNING").get()).docs.map(job => job.data());
+        const queuedJobs = (await jobCollection.where("status", "==", "QUEUED").get()).docs.map(job => job.data());
+        const jobs = runningJobs.concat(queuedJobs);
+        if(jobs.length === 0)
+            return;
+        const user = (await userDocument.withConverter(userConverter).get()).data()!;
+        let availableMemory = user?.memoryMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
+        let availablevCPU = user?.vCPUMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
+            
         while(queuedJobs.length > 0) {
             const job = queuedJobs.shift()!;
-            if(job.memoryMax <= availableMemory && job.vCPUMax <= availableCpu) {
+            if(job.memoryMax <= availableMemory && job.vCPUMax <= availablevCPU) {
                 job.solvers.forEach(solver => batchApi.createNamespacedJob("default", solverPodJob(userId, job.id, solver, job.memoryMax, job.vCPUMax)));
-                availableCpu += job.vCPUMax;
+                availablevCPU += job.vCPUMax;
                 availableMemory += job.memoryMax;
             } else {
                 break;

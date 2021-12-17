@@ -1,51 +1,36 @@
 import { Request, Response } from "express";
 import { Job, JobCollection, Status } from "./jobModel"
 import { v4 as uuid } from "uuid";
-import { getUserById } from "../userService";
+import { Transaction } from "@google-cloud/firestore";
+
+export const createJob = (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, solvers: string[],
+    config: {[key: string]: any} = {}, status: Status = "RUNNING"): Job => {
+    const jobId = uuid();
+    return {
+        id: jobId,
+        mznFileId: mznFileId,
+        dznFileId: dznFileId,
+        config: config,
+        status: status,
+        createdAt: Date.now(),
+        memoryMax: memoryMax,
+        vCPUMax: vCPUMax,
+        solvers: solvers
+    };
+}
 
 export const JobService = (userId: string) => {
     const jobCollection = JobCollection(userId);
-
-    const addJob = async (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, solvers: string[],
-        config: {[key: string]: any} = {}, status: Status = "RUNNING") => {
-        const jobId = uuid();
-        await jobCollection.doc(jobId).set({
-            id: jobId,
-            mznFileId: mznFileId,
-            dznFileId: dznFileId,
-            config: config,
-            result: {
-                status: status
-            },
-            createdAt: Date.now(),
-            memoryMax: memoryMax,
-            vCPUMax: vCPUMax,
-            solvers: solvers
-        });
-        return jobId;
-    }
 
     const getAllJobs = async () => {
         const jobSnapshot = await jobCollection.get();
         return jobSnapshot.docs.map((job) => job.data());
     }
 
-    const getAllRunningJobs = async () => {
-        return (await jobCollection.where("result.status", "==", "RUNNING").get()).docs.map(job => job.data());
-    }
-    
-    const getAvailableMemory = async ()  => {
-        const memoryMax = (await getUserById(userId))?.memoryMax!;
-        const remainingMemoryUsage = (await getAllRunningJobs())
-            .reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
-        return memoryMax - remainingMemoryUsage;
-    }
-    const getAvailablevCPU = async ()  => {
-        const vCPUMax = (await getUserById(userId))?.vCPUMax!;
-        const remainingvCPUMax = (await getAllRunningJobs())
-            .reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
-        return vCPUMax - remainingvCPUMax;
-    } 
+    const getAllQueuedAndRunningJobs = async () => (await jobCollection
+        .where("status", "==", "RUNNING")
+        .where("status", "==", "QUEUED")
+        .get()).docs.map(job => job.data());
 
     const listenOnChange = async (req: Request, res: Response) => {
         res.writeHead(200, {
@@ -63,12 +48,26 @@ export const JobService = (userId: string) => {
         });
     }
 
+    const withTransactions = (transaction: Transaction) => {
+        
+        const addJob = (job: Job) => transaction.create(jobCollection.doc(job.id), job);
+
+        const queuedAndRunningJobsQuery = async () => {
+            const runningJobs = await transaction.get(jobCollection.where("status", "==", "RUNNING"));
+            const queuedJobs = await transaction.get(jobCollection.where("status", "==", "QUEUED"));
+            return runningJobs.docs.map(job => job.data()).concat(queuedJobs.docs.map(job => job.data()));
+        }
+
+        return {
+            addJob,
+            queuedAndRunningJobsQuery
+        }
+    }
+
     return {
-        addJob,
         getAllJobs,
         listenOnChange,
-        getAvailableMemory,
-        getAvailablevCPU,
-        getAllRunningJobs
+        getAllQueuedAndRunningJobs,
+        withTransactions
     }
 }

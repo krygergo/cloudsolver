@@ -6,18 +6,18 @@ export interface Job {
     mznFileId: string
     dznFileId: string
     config: {[key: string]: any}
-    result: Result
+    result?: Result
     createdAt: number
     finishedAt?: number
     memoryMax: number
     vCPUMax: number
     solvers: string[]
+    status: Status
 }
 
 interface Result {
-    status: Status
-    solver?: string
-    output?: string
+    solver: string
+    output: string
 }
 
 export type Status = "RUNNING" | "FINISHED" | "QUEUED"

@@ -47,7 +47,6 @@ const kanikoJob = (solvername: string): V1Job => ({
     }
 })
 
-
 /* This will return true if the file was uploaded and false otherwise. */ 
 export const addSolverFile = async (fileUpload: UploadedFile) => {
     const file = bucket.file("solvers/" + fileUpload.name);
