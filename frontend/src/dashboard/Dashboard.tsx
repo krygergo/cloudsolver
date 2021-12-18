@@ -37,7 +37,7 @@ export default function Dashboard() {
                 <Col className="col-2" >
                     <Files/>
                 </Col>
-                <Col className="col-4">
+                <Col className="col-4 pe-1">
                     <FileIO/>
                 </Col>
                 <Col className="col-2 h-100">

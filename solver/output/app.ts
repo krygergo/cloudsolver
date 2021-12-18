@@ -103,30 +103,31 @@ const main = async () => {
     joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
         batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
     });
-        
-    const runningJobs = (await jobCollection.where("status", "==", "RUNNING").get()).docs.map(job => job.data());
-    const queuedJobs = (await jobCollection.where("status", "==", "QUEUED").get()).docs.map(job => job.data()).sort((aJob, bJob) => aJob.createdAt - bJob.createdAt);
-    const jobs = runningJobs.concat(queuedJobs);
-    if(jobs.length === 0)
-        return;
+    
     const user = (await userDocument.withConverter(userConverter).get()).data()!;
-    let availableMemory = user?.memoryMax! - runningJobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
-    let availablevCPU = user?.vCPUMax! - runningJobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
 
-    while(queuedJobs.length > 0) {
-        const job = queuedJobs.pop()!;
-        if(job.memoryMax <= availableMemory && job.vCPUMax <= availablevCPU) {
-            jobCollection.doc(job.id).update({
+    while(true) {
+        const job = await firestore.runTransaction(async transaction => {
+            const queuedJobSnapshot = await transaction.get(jobCollection.where("status", "==", "QUEUED"));
+            if(queuedJobSnapshot.empty)
+                return undefined;
+            const nextJob = queuedJobSnapshot.docs.sort((aJob, bJob) => aJob.data().createdAt - bJob.data().createdAt)[0].data();
+            const runningJobSnapshot = await transaction.get(jobCollection.where("status", "==", "RUNNING"));
+            const runningJobs = runningJobSnapshot.docs.map(job => job.data());
+            const availableMemory = user?.memoryMax! - runningJobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
+            const availablevCPU = user?.vCPUMax! - runningJobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
+            if(nextJob.memoryMax > availableMemory || nextJob.vCPUMax > availablevCPU)
+                return undefined;
+            transaction.update(jobCollection.doc(nextJob.id), {
                 status: "RUNNING"
-            })
-            job.solvers.forEach(solver => batchApi.createNamespacedJob("default", solverPodJob(
-                userId, job.id, solver, job.memoryMax / job.solvers.length, job.vCPUMax / job.solvers.length
-            )));
-            availablevCPU -= job.vCPUMax;
-            availableMemory -= job.memoryMax;
-        } else {
+            });
+            return nextJob;                
+        });
+        if(!job)
             break;
-        }
+        job.solvers.forEach(solver => batchApi.createNamespacedJob("default", solverPodJob(
+            userId, job.id, solver, job.memoryMax / job.solvers.length, job.vCPUMax / job.solvers.length
+        )));
     }
 }
 
