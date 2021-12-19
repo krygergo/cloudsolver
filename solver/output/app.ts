@@ -41,7 +41,7 @@ interface Job {
     id: string
     mznFileId: string
     dznFileId: string
-    flags: string
+    config: {[key: string]: any}
     result?: Result
     createdAt: number
     finishedAt?: number

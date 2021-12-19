@@ -38,7 +38,9 @@ export const JobService = (userId: string) => {
             "Connection": "keep-alive"
         });
         const unsub = jobCollection.onSnapshot(snapshot => {
-            res.write(`data: ${JSON.stringify(snapshot.docs.map(doc => doc.data()))}`);
+            res.write(`data: ${JSON.stringify(snapshot.docChanges().map(change => {
+                return {type: change.type, job: change.doc.data()};
+            }))}`);
             res.write("\n\n");
         });
         req.once("close", () => {

@@ -36,6 +36,9 @@ route.get("/job", async (req, res) => {
     res.send(await JobService(req.session.userId!).getAllJobs());
 })
 
-route.get("/job/listen", (req, res) => JobService(req.session.userId!).listenOnChange(req, res));
+route.get("/job/listen", (req, res, next) => {
+    req.setTimeout(1000 * 60 * 60 * 24);
+    next();
+}, (req, res) => JobService(req.session.userId!).listenOnChange(req, res));
 
 export default route;

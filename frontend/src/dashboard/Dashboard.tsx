@@ -1,36 +1,13 @@
-import React, { ChangeEvent, useEffect, useState } from 'react'
-import { Row, Col, ListGroup, Form, Button } from 'react-bootstrap';
+import { listenerCount } from 'process';
+import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
+import { Row, Col, ListGroup, Form, Button, FormControl, FormGroup } from 'react-bootstrap';
+import { getSupportedSolvers, submitSolverJob } from '../solver/SolverService';
 import { UserFile } from '../user/file/FileModel';
 import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile, putFileBinary, putFileName } from '../user/file/fileService';
 import FileProvider, { FileSelect, useFile } from './FileContext';
-
-export interface Job {
-    id: string
-    mznFileId: string
-    dznFileId: string
-    config: {[key: string]: any}
-    result: Result
-    createdAt: number
-    finishedAt?: number
-}
-
-interface Result {
-    status: Status
-    solver?: string
-    output?: string
-}
-
-type Status = "PENDING" | "FINISHED"
+import JobProvider, { useJobs } from './JobContext';
 
 export default function Dashboard() {
-
-    //const [jobState, setJobState] = useState<Job[]>([]);
-
-    useEffect(() => {
-        //const eventSource = new EventSource("https://api.cloudsolver.xyz/solver/job/listen", {withCredentials: true});
-        //eventSource.addEventListener("message", message => setJobState(JSON.parse(message.data)));
-    }, []);
-
     return (
         <div className="d-flex text-white">
             <FileProvider>
@@ -40,21 +17,23 @@ export default function Dashboard() {
                 <Col className="col-4 pe-1">
                     <FileIO/>
                 </Col>
-                <Col className="col-2 h-100">
-                    <Row style={{ height: "50vh" }}>
-                        <Col>
-                            <Jobs/>
-                        </Col>
-                    </Row>
-                    <Row className="h-50">
-                        <Col className="h-100">
-                            <SolverConfiguration/>
-                        </Col>
-                    </Row>
-                </Col>
-                <Col>
-                    <JobOutput/>
-                </Col>
+                <JobProvider>
+                    <Col className="col-2 h-100">
+                        <Row style={{ height: "55vh" }}>
+                            <Col>
+                                <Jobs/>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col className="h-100 w-100">
+                                <SolverConfiguration/>
+                            </Col>
+                        </Row>
+                    </Col>
+                    <Col>
+                        <JobOutput/>
+                    </Col>
+                </JobProvider>
             </FileProvider>
         </div>
     );
@@ -182,7 +161,7 @@ function FileIO() {
                 setShouldFetch(true);
             }
         })();
-    }, [selected, setShouldFetch]);
+    }, [selected]);
 
     function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
         event.preventDefault();
@@ -267,10 +246,19 @@ function FileIO() {
 }
 
 function Jobs() {
-
+    const jobs = useJobs()!;
     return (
         <div>
-            JOB
+            <ListGroup>
+                {jobs.map(job => {
+                    return (
+                        <ListGroup.Item>
+                            <b>{new Date(job.createdAt).toString().slice(0, 24)}</b>
+                            <b>{job.status}</b>
+                        </ListGroup.Item>
+                    );
+                })}
+            </ListGroup>
         </div>
     );
 }
@@ -285,26 +273,83 @@ function JobOutput() {
 }
 
 function SolverConfiguration() {
+    const [selectedSolvers, setSelectedSolvers] = useState<string[]>([]);
+    const [supportedSolvers, setSupportedSolvers] = useState<string[]>([]);
+    const vCPURef = useRef<HTMLInputElement>(null);
+    const memoryRef = useRef<HTMLInputElement>(null);
+    const flagsRef = useRef<HTMLInputElement>(null);
+    const { selected } = useFile()!;
+
+    useEffect(() => {
+        (async () => {
+            const solvers = await getSupportedSolvers();
+            if(solvers.length > 0)
+                setSupportedSolvers(solvers)
+        })();
+    }, []);
+
+    function onSolverSelect(solver: string) {
+        return (_: any) => {
+            const newSelectedSolvers = selectedSolvers.filter(selectedSolver => selectedSolver !== solver);
+            if(selectedSolvers.length !== newSelectedSolvers.length)
+                return setSelectedSolvers(newSelectedSolvers);
+            setSelectedSolvers([...selectedSolvers, solver]);
+        }
+    }
+
+    function onJobSubmit(formEvent: FormEvent) {
+        formEvent.preventDefault();
+        if(!selected.mzn.get)
+            return;
+        if(!selected.dzn.get)
+            return;
+        if(selectedSolvers.length === 0)
+            return;
+        submitSolverJob({
+            mznFileId: selected.mzn.get.id,
+            dznFileId: selected.dzn.get.id,
+            solvers: selectedSolvers,
+            vCPU: Number(vCPURef.current?.value) || undefined,
+            memory: Number(memoryRef.current?.value) || undefined,
+            flags: flagsRef.current?.value
+        });
+    }
 
     return (
         <>
-            <Row style={{ height: "40%" }}>
-                <ListGroup style={{ paddingLeft: "12px"}}>
-                    {["chuffed", "gecode", "hello9000"].map(solver => {
-                        return (
-                            <ListGroup.Item action>
-                                {solver}
-                            </ListGroup.Item>
-                        );
-                    })}    
-                </ListGroup>
+            <Row>
+                <div className="d-flex justify-content-center mb-2">
+                    <b>
+                        Supported Solvers
+                    </b>
+                </div>
+            </Row>
+            <Row style={{ height: "14vh", width: "100%", marginRight: "-4px", marginLeft: "-4px", overflow: "hidden" }}>
+                <div style={{ width: "100%", height: "100%", overflowY: "scroll", boxSizing: "content-box" }}>
+                    <ListGroup style={{ width: "100%" }}>
+                        {supportedSolvers.map(solver => {
+                            return (
+                                <ListGroup.Item className={`${selectedSolvers.find(selectedSolver => selectedSolver === solver) ? "bg-primary" : "bg-transparent"} mb-1 text-white`}
+                                    action onClick={onSolverSelect(solver)}>
+                                    {solver}
+                                </ListGroup.Item>
+                            );
+                        })}    
+                    </ListGroup>
+                </div>
             </Row>
             <Row>
-                <Form>
-                    <Form.Control className="mb-2" type="text" placeholder="vCPU"/>
-                    <Form.Control className="mb-2" type="text" placeholder="memory"/>
-                    <Form.Control className="mb-2" type="text" placeholder="flags"/>
-                    <Button style={{ width: "100%" }}>Submit Job</Button>
+                <Form onSubmit={onJobSubmit}>
+                    <FormGroup>
+                        <Form.Control ref={vCPURef} className="mb-2" type="number" placeholder="vCPU"/>
+                    </FormGroup>
+                    <FormGroup>
+                        <Form.Control ref={memoryRef} className="mb-2" type="number" placeholder="memory"/>
+                    </FormGroup>
+                    <FormGroup>
+                        <Form.Control ref={flagsRef} className="mb-2" type="text" placeholder="flags"/>
+                    </FormGroup>
+                    <Button type="submit" style={{ width: "100%" }}>Submit Job</Button>
                 </Form>
             </Row>
         </>
