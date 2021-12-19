@@ -1,11 +1,10 @@
-import { listenerCount } from 'process';
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
-import { Row, Col, ListGroup, Form, Button, FormControl, FormGroup } from 'react-bootstrap';
+import { Row, Col, ListGroup, Form, Button, FormGroup, Card } from 'react-bootstrap';
 import { getSupportedSolvers, submitSolverJob } from '../solver/SolverService';
 import { UserFile } from '../user/file/FileModel';
 import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile, putFileBinary, putFileName } from '../user/file/fileService';
 import FileProvider, { FileSelect, useFile } from './FileContext';
-import JobProvider, { useJobs } from './JobContext';
+import JobProvider, { Job, useJobs } from './JobContext';
 
 export default function Dashboard() {
     return (
@@ -19,8 +18,8 @@ export default function Dashboard() {
                 </Col>
                 <JobProvider>
                     <Col className="col-2 h-100">
-                        <Row style={{ height: "55vh" }}>
-                            <Col>
+                        <Row style={{ height: "55vh", width: "100%", overflow: "hidden" }}>
+                            <Col className="h-100 w-100">
                                 <Jobs/>
                             </Col>
                         </Row>
@@ -30,7 +29,7 @@ export default function Dashboard() {
                             </Col>
                         </Row>
                     </Col>
-                    <Col>
+                    <Col className="col-4">
                         <JobOutput/>
                     </Col>
                 </JobProvider>
@@ -246,29 +245,79 @@ function FileIO() {
 }
 
 function Jobs() {
-    const jobs = useJobs()!;
+    const {jobs, setJobOutput } = useJobs()!;
+
+    function onJobClick(job: Job) {
+        return (_: any) => {
+            setJobOutput(job);
+        }
+    }
+
     return (
-        <div>
-            <ListGroup>
+        <>
+        <div className="w-100 d-flex justify-content-center">
+            <b>Current Jobs</b>
+        </div>
+        <div style={{ width: "100%", height: "90%", overflowY: "scroll", paddingRight: "29px", boxSizing: "content-box" }}>
+            <ListGroup className="w-100">
                 {jobs.map(job => {
                     return (
-                        <ListGroup.Item>
-                            <b>{new Date(job.createdAt).toString().slice(0, 24)}</b>
-                            <b>{job.status}</b>
+                        <ListGroup.Item action 
+                            onClick={onJobClick(job)}
+                            className="d-flex flex-column bg-transparent mb-1 text-white" style={{ borderLeft: "none", borderRight: "none"}}>
+                            <small>{new Date(job.createdAt).toString().slice(0, 24)}</small>
+                            <small>{job.status}</small>
                         </ListGroup.Item>
                     );
                 })}
             </ListGroup>
         </div>
+        </>
     );
 }
 
 function JobOutput() {
-
+    const { jobOutput } = useJobs()!;
+    const { files } = useFile()!;
     return (
-        <div>
-            JobOutput
-        </div>
+        <>
+            {!jobOutput ? <></> :
+            <>
+            <div className="w-100 d-flex justify-content-center">
+                <b>
+                    Job data
+                    <hr style={{ marginTop: "0px" }}/>
+                </b>
+            </div>
+            <div className="d-flex flex-column w-100">
+                <b>mzn file: {files.find(file => file.id === jobOutput.mznFileId)?.name}</b>
+                <b>dzn file: {files.find(file => file.id === jobOutput.dznFileId)?.name}</b>
+                {jobOutput.finishedAt ? <b>finished at: {new Date(jobOutput.finishedAt).toString().slice(0, 24)}</b> : <b>finished at:</b>}
+                <b>flags: {Object.keys(jobOutput.config).map(key => `${key} ${jobOutput.config[key]}`).toString()}</b>
+                <b>vCPU: {jobOutput.vCPUMax}</b>
+                <b>memory: {jobOutput.memoryMax}</b>
+                <b>solvers: {jobOutput.solvers.toString()}</b>
+                <div className="w-100 d-flex justify-content-center">
+                    <b>
+                        Job output
+                        <hr style={{ marginTop: "0px" }}/>
+                    </b>
+                </div>
+                <b>fastest solution: {jobOutput.result?.solver}</b>
+                <Card className="bg-transparent" style={{ width: "100%", borderBottom: "none", borderLeft: "none", borderRight: "none"}}>
+                    <Card.Body>
+                        <div className="w-100 d-flex justify-content-center">
+                            <Card.Title>RESULT</Card.Title>
+                        </div>
+                        <Card.Text>
+                            {jobOutput.result?.output}
+                        </Card.Text>
+                    </Card.Body>
+                </Card>
+            </div>
+            </>
+            }
+        </>
     );
 }
 

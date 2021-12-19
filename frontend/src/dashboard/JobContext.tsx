@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import { createContext, ReactNode, useContext, useState } from "react";
 import { env } from "../config/environment";
 
+export type SetJobOutput = React.Dispatch<React.SetStateAction<Job | undefined>>;
+
 interface JobChange {
     type: "added" | "modified" | "removed"
     job: Job
@@ -26,9 +28,9 @@ interface Result {
     output: string
 }
 
-type Status = "RUNNING" | "FINISHED" | "QUEUED"
+export type Status = "RUNNING" | "FINISHED" | "QUEUED"
 
-const JobContext = createContext<Job[] | undefined>(undefined);
+const JobContext = createContext<{jobs: Job[], jobOutput?: Job, setJobOutput: SetJobOutput} | undefined>(undefined);
 
 export const useJobs = () => useContext(JobContext);
 
@@ -36,6 +38,7 @@ export default function JobProvider({children}: {children: ReactNode}) {
     const [jobs, _setJobs] = useState<Job[]>([]);
     const jobRef = useRef<Job[]>(jobs);
     const [loading, setLoading] = useState(true);
+    const [jobOutput, setJobOutput] = useState<Job>();
 
     const setJobs = (newJobs: Job[]) => {
         jobRef.current = newJobs;
@@ -64,7 +67,7 @@ export default function JobProvider({children}: {children: ReactNode}) {
     }, []);
 
     return (
-        <JobContext.Provider value={jobs}>
+        <JobContext.Provider value={{jobs: jobs, jobOutput: jobOutput, setJobOutput: setJobOutput}}>
             {!loading && children}
         </JobContext.Provider>
     )
