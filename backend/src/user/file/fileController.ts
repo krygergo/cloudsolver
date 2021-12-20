@@ -74,8 +74,8 @@ export default (req: Request, res: Response, next: NextFunction) => {
         res.sendStatus(200);
     });
 
-    route.delete("/:filedId", async (req, res) => {
-        if(!await fileService.fileById(req.params.filedId).deleteFile())
+    route.delete("/:fileId", async (req, res) => {
+        if(!await fileService.fileById(req.params.fileId).deleteFile())
             return res.status(400).send("Unable to delete.");
         res.sendStatus(200);
     })
