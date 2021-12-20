@@ -55,7 +55,7 @@ export const JobService = (userId: string) => {
 
     const deleteJob = async (jobId: string) => {
         const jobSnapshot = await jobCollection.doc(jobId).get();
-        if(!jobSnapshot.empty && jobSnapshot.data().status === "RUNNING"){ // job is running
+        if(!jobSnapshot.exists && jobSnapshot.data()?.status === "RUNNING"){ // job is running
             // stop the pod
             const allJobs = await k8s().batchApi.listNamespacedJob("default");
             allJobs.body.items.filter(job => job.metadata?.name?.startsWith(jobId))
