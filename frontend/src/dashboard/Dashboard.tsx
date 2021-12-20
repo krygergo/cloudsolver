@@ -253,23 +253,23 @@ function Jobs() {
 
     return (
         <>
-        <div className="w-100 d-flex justify-content-center">
-            <b>Current Jobs</b>
-        </div>
-        <div style={{ width: "100%", height: "90%", overflowY: "scroll", paddingRight: "29px", boxSizing: "content-box" }}>
-            <ListGroup className="w-100">
-                {jobs.map(job => {
-                    return (
-                        <ListGroup.Item action 
-                            onClick={onJobClick(job)}
-                            className="d-flex flex-column bg-transparent mb-1 text-white" style={{ borderLeft: "none", borderRight: "none"}}>
-                            <small>{new Date(job.createdAt).toString().slice(0, 24)}</small>
-                            <small>{job.status}</small>
-                        </ListGroup.Item>
-                    );
-                })}
-            </ListGroup>
-        </div>
+            <div className="w-100 d-flex justify-content-center">
+                <b>Current Jobs</b>
+            </div>
+            <div style={{ width: "100%", height: "90%", overflowY: "scroll", paddingRight: "29px", boxSizing: "content-box" }}>
+                <ListGroup className="w-100">
+                    {jobs.map(job => {
+                        return (
+                            <ListGroup.Item action 
+                                onClick={onJobClick(job)}
+                                className="d-flex flex-column bg-transparent mb-1 text-white" style={{ borderLeft: "none", borderRight: "none"}}>
+                                <small>{new Date(job.createdAt).toString().slice(0, 24)}</small>
+                                <small>{job.status}</small>
+                            </ListGroup.Item>
+                        );
+                    })}
+                </ListGroup>
+            </div>
         </>
     );
 }
@@ -295,6 +295,9 @@ function JobOutput() {
                 <b>vCPU: {jobOutput.vCPUMax}</b>
                 <b>memory: {jobOutput.memoryMax}</b>
                 <b>solvers: {jobOutput.solvers.toString()}</b>
+                <div className="d-flex justify-content-end">
+                    <Button variant="danger"></Button>
+                </div>
                 <div className="w-100 d-flex justify-content-center">
                     <b>
                         Job output
