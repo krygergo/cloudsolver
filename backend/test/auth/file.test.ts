@@ -53,20 +53,6 @@ jest.mock("../../src/user/file/fileService", () => ({
                     return undefined;
                 return "File";
             }
-            /*
-            const listenOnChange = (req: Request, res: Response) => {
-                const unsub = query.onSnapshot(snapshot => {
-                    if(!snapshot.empty) {
-                        res.send(snapshot.docs[0].data());
-                        unsub();
-                    }
-                },() => res.status(500).send("Error listening on file"));
-                req.once("close", () => {
-                    unsub();
-                    res.end();
-                });
-            }
-            */
             return {
                 get: getFile
             }
