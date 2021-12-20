@@ -373,7 +373,7 @@ function SolverConfiguration() {
             solvers: selectedSolvers,
             vCPU: Number(vCPURef.current?.value) || undefined,
             memory: Number(memoryRef.current?.value) || undefined,
-            flags: flagsRef.current?.value
+            config: flagsRef.current?.value
         });
     }
 

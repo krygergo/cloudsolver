@@ -6,15 +6,16 @@ import { getUserById } from "../userService";
 import firestore from "../../config/database/googleFirestore";
 import { solverPodJob } from "../../solver/solverService";
 import k8s from "../../config/kubernetes";
+import { configToJSON } from "./jobUtil";
 
 export const createJob = (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, solvers: string[],
-    config: {[key: string]: any} = {}, status: Status = "RUNNING"): Job => {
+    config: string = "", status: Status = "RUNNING"): Job => {
     const jobId = uuid();
     return {
         id: jobId,
         mznFileId: mznFileId,
         dznFileId: dznFileId,
-        config: config,
+        config: configToJSON(config),
         status: status,
         createdAt: Date.now(),
         memoryMax: memoryMax,

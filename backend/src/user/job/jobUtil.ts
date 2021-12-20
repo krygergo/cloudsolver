@@ -1,6 +1,6 @@
 // Idea to how to parse minzinc flags to json
-export const configToJSONParser = (configString: string): {[key: string]: any} => {
-    const _configToJSONParser = (configs: string[], result: {[key: string]: any}): {[key: string]: any} => {
+export const configToJSON = (configString: string, result: {[key: string]: any} = {}): {[key: string]: any} => {
+    const _configToJSONParser = (configs: string[]): {[key: string]: any} => {
         if(configs.length === 0)
             return result;
         if(configs.length === 1) {
@@ -12,13 +12,13 @@ export const configToJSONParser = (configString: string): {[key: string]: any} =
             result[key] = true;
         else
             result[key] = configs.shift()!;
-        return _configToJSONParser(configs, result);
+        return _configToJSONParser(configs);
     }
     const resolveKey = (key: string) => {
         if(key.startsWith("--"))
             return key.slice(2, key.length);
         else 
-            return key.slice(1, key.length);
+            return key;
     }
-    return _configToJSONParser(configString.split(" "), {});
+    return _configToJSONParser(configString.split(" "));
 }

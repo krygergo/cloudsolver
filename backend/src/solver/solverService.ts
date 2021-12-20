@@ -109,7 +109,7 @@ export const SolverService = (userId: string) => {
     const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
     const startSolverJob = async (mznFileId: string, dznFileId: string, solvers: string[], 
-        memoryMax?: number, vCPUMax?: number, config?: {[key: string]: any}) => {
+        memoryMax?: number, vCPUMax?: number, config?: string) => {
         const images = await artifactRegistryService.getAllImages();
         if(!solvers.every(solver => images.includes(solver)))
             return {code: 6, message: "One of the solvers specified is not supported"};
