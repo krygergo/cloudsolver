@@ -41,4 +41,9 @@ route.get("/job/listen", (req, res) => {
     JobService(req.session.userId!).listenOnChange(req, res)
 });
 
+route.delete("/job/:jobId", (req, res) => {
+    JobService(req.session.userId!).deleteJob(req.params.jobId);
+    res.send("Deleted job")
+})
+
 export default route;
