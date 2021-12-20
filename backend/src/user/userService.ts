@@ -71,10 +71,3 @@ export const updateUserResourcesById = async (userId: string, vCPUMax?: number, 
         return false;
     }
 }
-
-export const deleteUserJob = async (userId: string, jobId: string) => {
-    const allJobs = await k8s().batchApi.listNamespacedJob("default");
-    allJobs.body.items.filter(job => job.metadata?.name?.startsWith(jobId))
-        .forEach(job => k8s().batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background"));
-    JobService(userId).deleteJob(jobId);
-}
