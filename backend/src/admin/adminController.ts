@@ -15,11 +15,17 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
 route.use(verifyAdmin);
 
+/**
+ * Endpoint for deleting a user
+ */
 route.delete("/user/:userId", auth, (req, res) => {
     deleteUserById(req.params.userId);
     res.sendStatus(200);
 });
 
+/**
+ * Endpoint for updating a user's maximum amount of vCPUs and memory
+ */
 route.put("/user/:userId", async (req, res) => {
     if(!req.body.vCPUMax && !req.body.memoryMax)
         return res.status(400).send("No vCPUMax or memoryMax specified");
@@ -28,6 +34,9 @@ route.put("/user/:userId", async (req, res) => {
     updated ? res.sendStatus(200): res.sendStatus(400);
 });
 
+/**
+ * Endpoint for adding a new solver to the platform
+ */
 route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     if(!req.files)
         return res.status(404).send("File not found!");
@@ -45,8 +54,4 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     return res.status(201).send("Successfully uploaded the solverfile.");
 });
 
-
-
 export default route;
-
-

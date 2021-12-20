@@ -7,6 +7,9 @@ const route = Router();
 
 const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
+/**
+ * Endpoint for retrieving all solvers supported by the platform
+ */
 route.get("/", async (_, res) => {
     const images = await artifactRegistryService.getAllImages();
     if(images.length === 0)
@@ -14,6 +17,9 @@ route.get("/", async (_, res) => {
     res.send(({ images: images }));
 })
 
+/**
+ * Endpoint to add a new solver
+ */
 route.post("/", async (req, res) => {
     const body = req.body;
     if(!body.mznFileId)
@@ -32,15 +38,24 @@ route.post("/", async (req, res) => {
     res.status(200).send(solverJob.message);
 });
 
+/**
+ * Endpoint for retrieving all jobs for the current user
+ */
 route.get("/job", async (req, res) => {
     res.send(await JobService(req.session.userId!).getAllJobs());
 })
 
+/**
+ * Endpoint to listen for a change in the jobs for the current user
+ */
 route.get("/job/listen", (req, res) => {
     req.setTimeout(1000 * 60 * 60);
     JobService(req.session.userId!).listenOnChange(req, res)
 });
 
+/**
+ * Endpoint to delete a job for the current user
+ */
 route.delete("/job/:jobId", (req, res) => {
     JobService(req.session.userId!).deleteJob(req.params.jobId);
     res.send("Deleted job")
