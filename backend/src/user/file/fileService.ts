@@ -19,7 +19,7 @@ export const FileService = (userId: string) => {
         const fileBinaryDoc = fileBinaryService.createFileBinaryDoc(uuid());
         batch.set(fileBinaryDoc, {
             id: fileBinaryDoc.id,
-            binary: uploadedFile.data
+            binary: uploadedFile.data.toString()
         });
         const fileDoc = fileCollection.doc(uuid());
         const timeStamp = Date.now();
@@ -45,7 +45,7 @@ export const FileService = (userId: string) => {
             return fileSnapshot.data()!;
         }
 
-        const updateFileData = async (binary: Buffer) => {
+        const updateFileData = async (binary: string) => {
             const batch = firestore.batch();
             const file = await getFile();
             if(!file)

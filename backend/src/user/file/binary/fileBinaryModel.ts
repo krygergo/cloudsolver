@@ -3,7 +3,7 @@ import firestore from "../../../config/database/googleFirestore";
 
 export interface FileBinary {
     id: string
-    binary: Buffer
+    binary: string
 }
 
 const fileDataConverter: FirestoreDataConverter<FileBinary> = {

@@ -10,9 +10,7 @@ export interface UserFile {
 
 export interface FileBinary {
     id: string
-    binary: {
-        data: Buffer
-    }
+    binary: string
 }
 
 export type FileType = "mzn" | "dzn";

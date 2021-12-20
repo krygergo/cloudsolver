@@ -1,11 +1,12 @@
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot, Transaction } from "@google-cloud/firestore";
 import { readFileSync } from "fs";
-import { KubeConfig, BatchV1Api, V1Job } from "@kubernetes/client-node";
+import k8s, { KubeConfig, BatchV1Api, V1Job, CoreV1Api } from "@kubernetes/client-node";
 import { exit } from "process";
 
 const config = new KubeConfig();
 config.loadFromDefault();
 const batchApi = config.makeApiClient(BatchV1Api)
+const coreApi = config.makeApiClient(CoreV1Api);
 
 export type UserRight = "ADMIN" | "DEFAULT"
 
@@ -56,22 +57,45 @@ interface Result {
     output: string
 }
 
-type Status = "RUNNING" | "FINISHED" | "QUEUED"
+type Status = "RUNNING" | "FINISHED" | "QUEUED" | "FAILED"
 
 const firestore = new Firestore();
+const args = process.argv.slice(2);
+const userId = args[0];
+const jobId = args[1];
+const solver = args[2];
+const userDocument = firestore.collection("User").doc(userId);
+const jobCollection = userDocument.collection("Job").withConverter(jobConverter);
+const jobReference = jobCollection.doc(jobId);
+
+const start = Date.now();
+
+const interval = setInterval(async () => {
+    const pods = await coreApi.listNamespacedPod("default", undefined, undefined, undefined, undefined, `job-name=${jobId}-${solver}`);
+    const minizincState = pods.body.items[0].status?.containerStatuses?.find(container => container.name === "minizinc")?.state;
+    if(start < Date.now() - (1000 * 60 * 10)) {
+        await jobReference.update({
+            finishedAt: Date.now(),
+            status: "FAILED"
+        })
+        handleQueuedJobs();
+        clearInterval(interval);
+    } else if(!minizincState || minizincState.running) {
+        return;
+    } else if(minizincState.terminated?.exitCode === 0) {
+        main();
+        clearInterval(interval);
+    } else {
+        await jobReference.update({
+            finishedAt: minizincState.terminated?.finishedAt?.getMilliseconds(),
+            status: "FAILED"
+        });
+        handleQueuedJobs();
+        clearInterval(interval);
+    }
+}, 10000);
 
 const main = async () => {
-    const args = process.argv.slice(2);
-
-    const userId = args[0];
-    const jobId = args[1];
-    const solver = args[2];
-
-    const userDocument = firestore.collection("User").doc(userId);
-    const jobCollection = userDocument.collection("Job").withConverter(jobConverter);
-
-    const jobReference = jobCollection.doc(jobId);
-
     const outputTransaction = await firestore.runTransaction(async transaction => {
         const jobSnapshot = await transaction.get(jobReference);
 
@@ -103,7 +127,10 @@ const main = async () => {
     joblist.body.items.filter(job => job.metadata?.name?.startsWith(jobId) && !job.metadata?.name?.endsWith(solver)).forEach( job => {
         batchApi.deleteNamespacedJob(job.metadata?.name!, "default", undefined, undefined, undefined, undefined, "Background");
     });
-    
+    handleQueuedJobs();
+}
+
+const handleQueuedJobs = async () => {
     const user = (await userDocument.withConverter(userConverter).get()).data()!;
 
     while(true) {
@@ -131,9 +158,7 @@ const main = async () => {
     }
 }
 
-main();
-
-const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: number,vCPUMax: number): V1Job => ({
+const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
@@ -165,7 +190,8 @@ const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: n
                         mountPath: "/keys",
                         readOnly: true
                     }]
-                }, {
+                }],
+                containers: [{
                     name: "minizinc",
                     image: `eu.gcr.io/cloudsolver-334113/${solver}`,
                     resources: {
@@ -186,8 +212,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: n
                         name: "shared-data",
                         mountPath: "/shared",
                     }]
-                }],
-                containers: [{
+                }, {
                     name: "fileoutput",
                     image: "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/output",
                     command: [
@@ -220,10 +245,12 @@ const solverPodJob = (userId: string, jobId: string, solver: string,memoryMax: n
                         secretName: "google-api-key"
                     }
                 }],
-                restartPolicy: "Never"
+                restartPolicy: "Never",
+                
             }
         },
-        activeDeadlineSeconds: 60 * 5, // Must finish within 5min
+        backoffLimit: 0,
+        activeDeadlineSeconds: 60 * 15, // Must finish within 15min
         ttlSecondsAfterFinished: 0
     }
 });

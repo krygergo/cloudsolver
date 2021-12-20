@@ -142,8 +142,7 @@ function FileIO() {
             if(selected.mzn.get && shouldFetch) {
                 const mzn = selected.mzn.get;
                 const fileBinary = await getFileBinary(mzn.fileBinaryId);
-                const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
-                setMznText({name: mzn.name, body: fileBinaryText});
+                setMznText({name: mzn.name, body: fileBinary.binary});
             } else if(!selected.mzn.get && shouldFetch) {
                 setMznText(emptyText);
             } else {
@@ -152,8 +151,7 @@ function FileIO() {
             if(selected.dzn.get && shouldFetch) {
                 const dzn = selected.dzn.get;
                 const fileBinary = await getFileBinary(dzn.fileBinaryId);
-                const fileBinaryText = Buffer.from(fileBinary.binary.data).toString();
-                setDznText({name: dzn.name, body: fileBinaryText});
+                setDznText({name: dzn.name, body: fileBinary.binary});
             } else if(!selected.mzn.get && shouldFetch) {
                 setDznText(emptyText);
             } else {
@@ -164,7 +162,7 @@ function FileIO() {
 
     function updateMzn(event: React.MouseEvent<HTMLElement, MouseEvent>) {
         event.preventDefault();
-        putFileBinary(selected.mzn.get?.id!, Buffer.from(mznText.body));
+        putFileBinary(selected.mzn.get?.id!, mznText.body);
         if(mznText.name !== selected.mzn.get?.name) {
             putFileName(selected.mzn.get?.id!, mznText.name);
             const newFile = { ...selected.mzn.get!, name: mznText.name };
@@ -182,7 +180,7 @@ function FileIO() {
     }
 
     function updateDzn() {
-        putFileBinary(selected.dzn.get?.id!, Buffer.from(dznText.body));
+        putFileBinary(selected.dzn.get?.id!, dznText.body);
         if(dznText.name !== selected.dzn.get?.name) {
             putFileName(selected.dzn.get?.id!, dznText.name);
             const newFile = { ...selected.dzn.get!, name: dznText.name };

@@ -12,7 +12,7 @@ const fileBinaryConverter: FirestoreDataConverter<FileBinary> = {
 
 interface FileBinary {
     id: string
-    binary: Buffer
+    binary: string
 }
 
 const fileConverter: FirestoreDataConverter<File> = {

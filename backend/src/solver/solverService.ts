@@ -7,7 +7,7 @@ import { getUserById } from "../user/userService";
 import firestore from "../config/database/googleFirestore";
 import { Job } from "../user/job/jobModel";
 
-const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
+export const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
     kind: "Job",
     metadata: {
@@ -39,7 +39,8 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                         mountPath: "/keys",
                         readOnly: true
                     }]
-                }, {
+                }],
+                containers: [{
                     name: "minizinc",
                     image: `eu.gcr.io/cloudsolver-334113/${solver}`,
                     resources: {
@@ -47,8 +48,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                             memory:`${memoryMax}Mi`,
                             cpu: `${vCPUMax}m`
                         }
-                    }
-                    ,
+                    },
                     command: [
                         "minizinc"
                     ],
@@ -61,8 +61,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                         name: "shared-data",
                         mountPath: "/shared",
                     }]
-                }],
-                containers: [{
+                }, {
                     name: "fileoutput",
                     image: "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/output",
                     command: [
@@ -98,7 +97,8 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                 restartPolicy: "Never"
             }
         },
-        activeDeadlineSeconds: 60 * 5, // Must finish within 5min
+        backoffLimit: 0,
+        activeDeadlineSeconds: 60 * 15, // Must finish within 15min
         ttlSecondsAfterFinished: 0
     }
 });
