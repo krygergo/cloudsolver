@@ -76,7 +76,10 @@ const interval = setInterval(async () => {
     if(start < Date.now() - (1000 * 60 * 10)) {
         await jobReference.update({
             finishedAt: Date.now(),
-            status: "FAILED"
+            status: "FAILED",
+            result: {
+                output: "Exceeded allowed time"
+            }
         })
         handleQueuedJobs();
         clearInterval(interval);
@@ -87,8 +90,11 @@ const interval = setInterval(async () => {
         clearInterval(interval);
     } else {
         await jobReference.update({
-            finishedAt: minizincState.terminated?.finishedAt?.getMilliseconds(),
-            status: "FAILED"
+            finishedAt: Date.now(),
+            status: "FAILED",
+            result: {
+                output: "Error in minizinc"
+            }
         });
         handleQueuedJobs();
         clearInterval(interval);
