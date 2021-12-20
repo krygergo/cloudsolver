@@ -1,6 +1,6 @@
 import React, { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { Row, Col, ListGroup, Form, Button, FormGroup, Card } from 'react-bootstrap';
-import { getSupportedSolvers, submitSolverJob } from '../solver/SolverService';
+import { deletSolverJob, getSupportedSolvers, submitSolverJob } from '../solver/SolverService';
 import { UserFile } from '../user/file/FileModel';
 import { deleteFile, getFileBinary, getFileByNameListen, getFiles, postFile, putFileBinary, putFileName } from '../user/file/fileService';
 import FileProvider, { FileSelect, useFile } from './FileContext';
@@ -275,8 +275,14 @@ function Jobs() {
 }
 
 function JobOutput() {
-    const { jobOutput } = useJobs()!;
+    const { jobOutput, setJobOutput } = useJobs()!;
     const { files } = useFile()!;
+
+    function onJobDelete(_: any) {
+        deletSolverJob(jobOutput?.id!);
+        setJobOutput(undefined);
+    }
+
     return (
         <>
             {!jobOutput ? <></> :
@@ -290,13 +296,14 @@ function JobOutput() {
             <div className="d-flex flex-column w-100">
                 <b>mzn file: {files.find(file => file.id === jobOutput.mznFileId)?.name}</b>
                 <b>dzn file: {files.find(file => file.id === jobOutput.dznFileId)?.name}</b>
+                <b>created at: {new Date(jobOutput.createdAt).toString().slice(0, 24)}</b>
                 {jobOutput.finishedAt ? <b>finished at: {new Date(jobOutput.finishedAt).toString().slice(0, 24)}</b> : <b>finished at:</b>}
                 <b>flags: {Object.keys(jobOutput.config).map(key => `${key} ${jobOutput.config[key]}`).toString()}</b>
                 <b>vCPU: {jobOutput.vCPUMax}</b>
                 <b>memory: {jobOutput.memoryMax}</b>
                 <b>solvers: {jobOutput.solvers.toString()}</b>
                 <div className="d-flex justify-content-end">
-                    <Button variant="danger"></Button>
+                    <Button onClick={onJobDelete} variant="danger">Delete</Button>
                 </div>
                 <div className="w-100 d-flex justify-content-center">
                     <b>

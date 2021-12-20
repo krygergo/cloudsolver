@@ -1,6 +1,7 @@
 import { FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 import firestore from "../../../config/database/googleFirestore";
 
+// The data of a file, was prevously used as a collection with binary data, but changing it to string made some code simpler
 export interface FileBinary {
     id: string
     binary: string
