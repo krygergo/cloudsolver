@@ -243,11 +243,15 @@ function FileIO() {
 }
 
 function Jobs() {
-    const {jobs, setJobOutput } = useJobs()!;
+    const {jobs, setJobOutput, jobOutput } = useJobs()!;
 
     function onJobClick(job: Job) {
         return (_: any) => {
-            setJobOutput(job);
+            if(jobOutput?.id === job.id) {
+                setJobOutput(undefined);
+            } else {
+                setJobOutput(job);
+            }
         }
     }
 
@@ -262,7 +266,8 @@ function Jobs() {
                         return (
                             <ListGroup.Item action 
                                 onClick={onJobClick(job)}
-                                className="d-flex flex-column bg-transparent mb-1 text-white" style={{ borderLeft: "none", borderRight: "none"}}>
+                                className={`d-flex flex-column mb-1 ${job.id === jobOutput?.id ? "" : "bg-transparent text-white"}`} 
+                                style={{ borderLeft: "none", borderRight: "none"}}>
                                 <small>{new Date(job.createdAt).toString().slice(0, 24)}</small>
                                 <small>{job.status}</small>
                             </ListGroup.Item>

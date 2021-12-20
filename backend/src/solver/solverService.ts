@@ -123,7 +123,7 @@ export const SolverService = (userId: string) => {
             if(memoryUsage > user?.memoryMax!)
                 return {code: 3, message: "Memory specified exceeds users maximum"};
             const vCPUUsage = vCPUMax ? vCPUMax : user?.vCPUMax!;
-            if(vCPUUsage > user?.memoryMax!)
+            if(vCPUUsage > user?.vCPUMax!)
                 return {code: 2, message: "CPU spceficied exceeds users maximum"};
 
             const jobId = await firestore().runTransaction(async transacation => {
