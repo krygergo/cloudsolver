@@ -4,8 +4,8 @@ on:
     branches-ignore:
       - main
     paths:
-      - ./backend
-      
+      - ./backend/**
+
 jobs:
   integration-backend:
     runs-on: ubuntu-latest
