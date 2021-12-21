@@ -1,21 +1,21 @@
-# name: CI
-# on:
-#   push:
-#     branches-ignore: [ main ]
-#     paths: [ backend/**, frontend/** ]
+name: CI
+on:
+  push:
+    branches-ignore: [ main ]
+    paths: [ backend/**, frontend/** ]
 
-# jobs:
-#   integration:
-#     runs-on: ubuntu-latest
-#     environment: production
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    environment: production
 
-#     strategy:
-#       matrix:
-#         node-version: [ 16.13.0 ]
+    strategy:
+      matrix:
+        node-version: [ 16.13.0 ]
     
-#     steps:
-#     - name: Checkout
-#       uses: actions/checkout@v2
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
     
 #     - name: Check which folder
 #       uses: dorny/paths-filter@v2
