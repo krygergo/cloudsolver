@@ -30,7 +30,7 @@ jobs:
 # ----------------- BACKEND -----------------------------
     # if: env.path == 'true'
     - name: cd folder
-      run: cd backend && ls && echo env.path
+      run: cd backend && ls && echo github.action_path
     
     - name: Setup Node - backend
       uses: actions/setup-node@v2
