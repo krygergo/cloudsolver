@@ -1,10 +1,10 @@
 name: CI
 on:
   push:
-    branches-ignore:
-      - main
-    paths:
-      - './backend/**'
+    - branches-ignore:
+        - main
+      paths:
+        - './backend/**'
 
 jobs:
   integration-backend:
