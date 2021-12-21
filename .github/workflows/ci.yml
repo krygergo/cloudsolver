@@ -27,7 +27,8 @@ jobs:
           frontend:
             - 'frontend/**'
 
-    - name: Setup Node
+# ----------------- BACKEND -----------------------------
+    - name: Setup Node - backend
       if: steps.filter.outputs.backend == 'true'
       uses: actions/setup-node@v2
       with:
@@ -35,30 +36,31 @@ jobs:
         cache: 'npm'
         cache-dependency-path: './backend/package-lock.json'
         
-    - name: Install dependencies
+    - name: Install dependencies - backend
       if: steps.filter.outputs.backend == 'true'
       working-directory: ./backend
       run: npm ci --silent
     
-    - name: Run Tests
+    - name: Run tests - backend
       if: steps.filter.outputs.backend == 'true'
       working-directory: ./backend
       run: npm run test
 
-    #   - name: Setup Node
-    #   if: steps.filter.outputs.frontend == 'true'
-    #   uses: actions/setup-node@v2
-    #   with:
-    #     node-version: ${{ matrix.node-version }}
-    #     cache: 'npm'
-    #     cache-dependency-path: './frontend/package-lock.json'
+# ----------------- FRONTEND -----------------------------
+    - name: Setup Node - frontend
+      if: steps.filter.outputs.frontend == 'true'
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: './frontend/package-lock.json'
         
-    # - name: Install dependencies
-    #   if: steps.filter.outputs.frontend == 'true'
-    #   working-directory: ./frontend
-    #   run: npm ci --silent
+    - name: Install dependencies - frontend
+      if: steps.filter.outputs.frontend == 'true'
+      working-directory: ./frontend
+      run: npm ci --silent
     
-    # - name: Run Tests
-    #   if: steps.filter.outputs.frontend == 'true'
-    #   working-directory: ./frontend
-    #   run: npm run test
+    - name: Run tests - frontend
+      if: steps.filter.outputs.frontend == 'true'
+      working-directory: ./frontend
+      run: npm run test
