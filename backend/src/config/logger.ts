@@ -1,4 +1,4 @@
-import winston from "winston";
+import winston, { createLogger } from "winston";
 import { env } from "./environment";
 
 const level = () => {
@@ -10,7 +10,11 @@ const level = () => {
         return "info";
 }
 
-export const defaultConfig: winston.LoggerOptions = {
+const defaultConfig: winston.LoggerOptions = {
     level: level(),
     transports: [ new winston.transports.Console() ]
 }
+
+const winston_logger = createLogger(defaultConfig);
+
+export default () => winston_logger;

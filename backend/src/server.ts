@@ -1,8 +1,8 @@
 import { createLogger } from "winston";
 import app from "./app";
-import { defaultConfig } from "./config/logger";
+import get_logger from "./config/logger";
 
-const logger = createLogger(defaultConfig);
+const logger = get_logger();
 
 app.listen(3000);
 
