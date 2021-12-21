@@ -103,6 +103,9 @@ export const solverPodJob = (userId: string, jobId: string, solver: string, memo
     }
 });
 
+/**
+ * This function returns a single function, that is used to start solvers inthe name of the user.
+ */
 export const SolverService = (userId: string) => {
     const jobService = JobService(userId);
     const fileService = FileService(userId);

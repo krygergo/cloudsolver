@@ -8,7 +8,7 @@ const route = Router();
 const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
 /**
- * Endpoint for retrieving all solvers supported by the platform
+ * Endpoint for retrieving all solvers supported by the platform.
  */
 route.get("/", async (_, res) => {
     const images = await artifactRegistryService.getAllImages();
@@ -18,7 +18,7 @@ route.get("/", async (_, res) => {
 })
 
 /**
- * Endpoint to add a new solver
+ * Endpoint to start a new solver job.
  */
 route.post("/", async (req, res) => {
     const body = req.body;
@@ -40,7 +40,7 @@ route.post("/", async (req, res) => {
 });
 
 /**
- * Endpoint for retrieving all jobs for the current user
+ * Endpoint for retrieving the user's own jobs.
  */
 route.get("/job", async (req, res) => {
     res.send(await JobService(req.session.userId!).getAllJobs());

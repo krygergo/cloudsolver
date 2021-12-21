@@ -39,7 +39,7 @@ const userSession = async (req: Request, res: Response, next: NextFunction) => {
         return res.status(401).send("Unauthorized request");
     const userSession = await getUserSessionById(req.sessionID);
     if(!userSession)
-        return res.status(403).send("Session do not exist");
+        return res.status(403).send("Session does not exist");
     if(userSession.userId !== req.session.userId)
         return res.status(403).send("Error in cookie");
     next();
@@ -53,10 +53,17 @@ const authCookie: CookieOptions = {
 
 const route = Router();
 
+/**
+ * These two routes are for unauthorized users.
+ */
 route.use(session);
 route.post("/signup", userInfo, signup(authCookie));
 route.post("/login", userInfo, login(authCookie));
-route.use(userSession);
+
+/**
+ * All other routes are only accessible when the user has a session ID.
+ */
+route.use(userSession); // Checks for valid cookie
 route.use("/user", userRoute);
 route.use("/file", fileRoute);
 route.use("/cluster", clusterRoute);
