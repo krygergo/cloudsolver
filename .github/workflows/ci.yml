@@ -3,59 +3,32 @@ on:
   push:
     branches-ignore:
       - main
-    
-jobs:
-  integration-backend:
-    runs-on: ubuntu-latest
-    environment: production
+    paths:
+      - ./backend
+        jobs:
+          integration-backend:
+            runs-on: ubuntu-latest
+            environment: production
 
-    strategy:
-      matrix:
-        node-version: [ 16.13.0 ]
-    
-    steps:
-     - name: Checkout
-       uses: actions/checkout@v2
-    
-     - name: Setup Node
-       uses: actions/setup-node@v2
-       with:
-         node-version: ${{ matrix.node-version }}
-         cache: 'npm'
-         cache-dependency-path: './backend/package-lock.json'
-        
-     - name: Install dependencies
-       working-directory: ./backend
-       run: npm ci --silent
-     
-     - name: Run Tests
-       working-directory: ./backend
-       run: npm run test
-
-# integration-frontend:
-#     runs-on: ubuntu-latest
-#     environment: production
-  
-#     strategy:
-#       matrix:
-#         node-version: [ 16.13.0 ]
-    
-#     steps:
-#      - name: Checkout
-#        working-directory: ./frontend
-#        uses: actions/checkout@v2
-    
-#      - name: Setup Node
-#        working-directory: ./frontend
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: ${{ matrix.node-version }}
-#          cache: 'npm'
-        
-#      - name: Install dependencies
-#        working-directory: ./frontend
-#        run: npm ci --silent
-     
-#      - name: Run Tests
-#        working-directory: ./frontend
-#        run: npm run test
+            strategy:
+              matrix:
+                node-version: [ 16.13.0 ]
+            
+            steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+            
+            - name: Setup Node
+              uses: actions/setup-node@v2
+              with:
+                node-version: ${{ matrix.node-version }}
+                cache: 'npm'
+                cache-dependency-path: './backend/package-lock.json'
+                
+            - name: Install dependencies
+              working-directory: ./backend
+              run: npm ci --silent
+            
+            - name: Run Tests
+              working-directory: ./backend
+              run: npm run test
