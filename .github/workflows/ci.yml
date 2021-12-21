@@ -2,7 +2,7 @@ name: CI
 on:
   push:
     branches-ignore: [ main ]
-    # paths: [ backend, frontend ]
+    paths: [ backend, frontend ]
 
 jobs:
   integration:
@@ -28,9 +28,9 @@ jobs:
             - 'frontend/**'
 
 # ----------------- BACKEND -----------------------------
-    # if: env.path == 'true'
+    if: steps.filter.outputs.backend == 'true'
     - name: cd folder
-      run: cd backend && ls && echo github.action_path
+      run: cd backend && ls
     
     - name: Setup Node - backend
       uses: actions/setup-node@v2
