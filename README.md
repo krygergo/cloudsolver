@@ -1,7 +1,9 @@
 # cloudsolver
 dm885 group 3 default cloud solver project
 The system is built with Kubernetes to manage the services containers and the deployment of the system.
-To deploy the system simply use kubernetes to deploy the backend with /dpk8s.
+To deploy the system simply use kubernetes to deploy the backend with /dpk8s. After the backend has deployed, you must wait for it to certify for your key, in which it is also understoo that you will have to make a
+
+
 
 
 The frontend can be accessed on cloudsolver.xyz after the backend is deployed from where the user can upload your mzn and dzn files.
