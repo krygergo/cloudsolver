@@ -1,7 +1,8 @@
 name: CI
 on:
   push:
-    branches-ignore: [ main ]
+    branches-ignore: 
+      - main
     # paths: [ backend, frontend ]
 
 jobs:
