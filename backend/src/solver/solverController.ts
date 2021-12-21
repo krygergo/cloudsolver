@@ -2,6 +2,7 @@ import { Router } from "express";
 import { ArtifactRegistryService } from "../google/artifactRegistryService";
 import { SolverService } from "./solverService";
 import { JobService } from "../user/job/jobService";
+import {jsonify} from "../javascript/javatest";
 
 const route = Router();
 
@@ -31,7 +32,7 @@ route.post("/", async (req, res) => {
     if(!Array.isArray(body.solvers))
         return res.status(400).send("Solvers field must be of type array");
     const solverJob = (await SolverService(req.session.userId!).startSolverJob(
-        body.mznFileId, body.dznFileId, body.solvers, body.memoryMax, body.vCPUMax, body.config
+        body.mznFileId, body.dznFileId, body.solvers, body.memoryMax, body.vCPUMax, body.config?jsonify(body.config):{}
     ));
     if(solverJob.code !== 0)
         return res.status(400).send(solverJob.message);
