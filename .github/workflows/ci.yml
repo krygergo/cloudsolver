@@ -29,7 +29,7 @@ jobs:
             - 'frontend/**'
 
 # ----------------- BACKEND -----------------------------
-    if: steps.filter.outputs.backend == 'true'
+    # if: steps.filter.outputs.backend == 'true'
     - name: cd folder
       run: cd backend && ls
     
@@ -46,7 +46,7 @@ jobs:
       run: npm run test
 
 # ----------------- FRONTEND -----------------------------
-    if: steps.filter.outputs.frontend == 'true'
+    # if: steps.filter.outputs.frontend == 'true'
     - name: Setup Node - frontend
       uses: actions/setup-node@v2
       with:
