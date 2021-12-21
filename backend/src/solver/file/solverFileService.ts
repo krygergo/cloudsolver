@@ -59,9 +59,11 @@ export const addSolverFile = async (fileUpload: UploadedFile) => {
     passthroughStream.end();
 
     async function streamFileUpload() {
-        passthroughStream.pipe(file.createWriteStream()).on('finish', () => {})}
+        passthroughStream.pipe(file.createWriteStream()).on('finish', () => {})
+    };
+    
     streamFileUpload().catch(console.error);
     const solvername = fileUpload.name.slice(0, fileUpload.name.length-".tar.gz".length);
-    k8s().batchApi.createNamespacedJob("default", kanikoJob(solvername))
+    k8s().batchApi.createNamespacedJob("default", kanikoJob(solvername));
     return true; 
 }

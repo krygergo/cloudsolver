@@ -13,5 +13,4 @@ If the user does not specifcy how much memory or vCPU's they wish to use it will
 If a user does not have enough resources it will queue their jobs.
 
 
-The admin can delete a user and all their jobs from the GUI, as well as signle jobs, aswell as add additional solvers. But the rest of the framework is handled by 
-the framework on Google Cloud.
+The admin can delete a user and all their jobs from the GUI, as well as signle jobs, aswell as add additional solvers. But the rest of the framework is handled by the framework on Google Cloud.
