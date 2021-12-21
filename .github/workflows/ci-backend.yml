@@ -16,9 +16,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-
-    - name: cd folder
-      run: cd backend
     
     - name: Setup Node - backend
       uses: actions/setup-node@v2
@@ -28,7 +25,9 @@ jobs:
         cache-dependency-path: './backend/package-lock.json'
         
     - name: Install dependencies - backend
+      working-dir: ./backend
       run: npm ci --silent
     
     - name: Run tests - backend
+      working-dir: backend
       run: npm run test
