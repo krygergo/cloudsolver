@@ -21,7 +21,7 @@ const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
 route.use(verifyAdmin);
 
 /**
- * Endpoint for deleting a user
+ * Endpoint for deleting a user.
  */
 route.delete("/user/:userId", auth, (req, res) => {
     deleteUserById(req.params.userId);

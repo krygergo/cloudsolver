@@ -24,6 +24,9 @@ const isMinizincFile = (name: string) =>  {
     return fileType === "mzn" || fileType === "dzn";
 }
 
+/**
+ * Returns a route that maps functions to endpoints relative to the user id.
+ */
 export default (req: Request, res: Response, next: NextFunction) => {
     const fileService = FileService(req.session.userId!);
     const fileBinaryService = FileBinaryService(req.session.userId!);

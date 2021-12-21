@@ -8,5 +8,5 @@ export interface SolverJob {
     solvers: string[]
     vCPU?: number
     memory?: number
-    flags?: string
+    config?: string
 }

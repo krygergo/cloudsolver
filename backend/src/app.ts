@@ -2,11 +2,11 @@ import cors from "cors";
 import express from "express";
 import { createLogger } from "winston";
 import { env } from "./config/environment";
-import { defaultConfig } from "./config/logger";
+import get_logger from "./config/logger";
 import { route as apiRoute } from "./config/routing";
 import initializeDatabase from "./config/database/initialize";
 
-const logger = createLogger(defaultConfig);
+const logger = get_logger()
 
 const app = express();
 

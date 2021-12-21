@@ -7,6 +7,9 @@ import { v4 as uuid } from "uuid";
 
 const firestore = googleFirestore();
 
+/**
+ * Returns a list of functions related to the user files.
+ */
 export const FileService = (userId: string) => {
     const fileBinaryService = FileBinaryService(userId);
     const fileCollection = FileCollection(userId);

@@ -318,13 +318,15 @@ function JobOutput() {
                 </div>
                 <b>fastest solution: {jobOutput.result?.solver}</b>
                 <Card className="bg-transparent" style={{ width: "100%", borderBottom: "none", borderLeft: "none", borderRight: "none"}}>
-                    <Card.Body>
+                    <Card.Body >
                         <div className="w-100 d-flex justify-content-center">
                             <Card.Title>RESULT</Card.Title>
                         </div>
-                        <Card.Text>
-                            {jobOutput.result?.output}
-                        </Card.Text>
+                        <div className="scrollbar scrollbar-primary" style={{ height: "50vh", overflowY: "scroll" }}>
+                            <Card.Text>
+                                {jobOutput.result?.output}
+                            </Card.Text>
+                        </div>
                     </Card.Body>
                 </Card>
             </div>
@@ -373,7 +375,7 @@ function SolverConfiguration() {
             solvers: selectedSolvers,
             vCPU: Number(vCPURef.current?.value) || undefined,
             memory: Number(memoryRef.current?.value) || undefined,
-            flags: flagsRef.current?.value
+            config: flagsRef.current?.value
         });
     }
 

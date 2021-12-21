@@ -6,15 +6,21 @@ import { getUserById } from "../userService";
 import firestore from "../../config/database/googleFirestore";
 import { solverPodJob } from "../../solver/solverService";
 import k8s from "../../config/kubernetes";
+import { configToJSON } from "./jobUtil";
 
+
+/**
+ * Called by users when creating jobs. Takes in the user input and
+ * returns a job object.
+ */
 export const createJob = (mznFileId: string, dznFileId: string, memoryMax: number, vCPUMax: number, solvers: string[],
-    config: {[key: string]: any} = {}, status: Status = "RUNNING"): Job => {
+    config: string = "", status: Status = "RUNNING"): Job => {
     const jobId = uuid();
     return {
         id: jobId,
         mznFileId: mznFileId,
         dznFileId: dznFileId,
-        config: config,
+        config: configToJSON(config),
         status: status,
         createdAt: Date.now(),
         memoryMax: memoryMax,
@@ -23,6 +29,9 @@ export const createJob = (mznFileId: string, dznFileId: string, memoryMax: numbe
     };
 }
 
+/**
+ * 
+ */
 export const JobService = (userId: string) => {
     const jobCollection = JobCollection(userId);
 
