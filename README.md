@@ -1,10 +1,10 @@
 # cloudsolver
 dm885 group 3 default cloud solver project
 The system is built with Kubernetes to manage the services containers and the deployment of the system.
-To deploy the system simply use kubernetes to deploy the backend & the frontend.
+To deploy the system simply use kubernetes to deploy the backend with /dpk8s.
 
 
-From the the website can be accessed on cloudsolver.xyz from where the user can upload your mzn and dzn files.
+The frontend can be accessed on cloudsolver.xyz after the backend is deployed from where the user can upload your mzn and dzn files.
 Then the user can choose to run a job with any set of solvers supported by site, with a txt file of flags you wish to execute along with it.
 If user choose multiple solvers to run on the same dzn and mzn files it will execute as a batch, returning only with the fastest result.
 If the user does not specifcy how much memory or vCPU's they wish to use it will by default choose all of their avaiable resources.
