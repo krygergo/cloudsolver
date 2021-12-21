@@ -22,5 +22,3 @@ export const configToJSON = (configString: string, result: {[key: string]: any} 
     }
     return _configToJSONParser(configString.split(" "));
 }
-
-console.log(configToJSON(""));
