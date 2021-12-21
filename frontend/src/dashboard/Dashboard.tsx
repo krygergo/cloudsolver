@@ -322,7 +322,7 @@ function JobOutput() {
                         <div className="w-100 d-flex justify-content-center">
                             <Card.Title>RESULT</Card.Title>
                         </div>
-                        <Card.Text>
+                        <Card.Text style={{ overflowY: "scroll"}}>
                             {jobOutput.result?.output}
                         </Card.Text>
                     </Card.Body>
