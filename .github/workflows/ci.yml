@@ -19,10 +19,10 @@ jobs:
     
      - name: Setup Node
        uses: actions/setup-node@v2
-       working-directory: ./backend
        with:
          node-version: ${{ matrix.node-version }}
          cache: 'npm'
+         cache-dependency-path: './backend/package-lock.json'
         
      - name: Install dependencies
        working-directory: ./backend
