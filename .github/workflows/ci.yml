@@ -1,8 +1,8 @@
 name: CI
 on:
   push:
-    branches-ignore:
-      - main
+    branches-ignore: [ main ]
+    paths: [ backend, frontend ]
 
 jobs:
   integration:
@@ -28,31 +28,25 @@ jobs:
             - 'frontend/**'
 
 # ----------------- BACKEND -----------------------------
+    # if: env.path == 'true'
     - name: cd folder
-      if: steps.filter.outputs.backend == 'true'
-      run: cd backend && ls
+      run: cd backend && ls && echo env.path
     
     - name: Setup Node - backend
-      if: steps.filter.outputs.backend == 'true'
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './backend/package-lock.json'
         
     - name: Install dependencies - backend
-      if: steps.filter.outputs.backend == 'true'
-      working-directory: ./backend
       run: npm ci --silent
     
     - name: Run tests - backend
-      if: steps.filter.outputs.backend == 'true'
-      working-directory: ./backend
       run: npm run test
 
 # ----------------- FRONTEND -----------------------------
+    if: steps.filter.outputs.frontend == 'true'
     - name: Setup Node - frontend
-      if: steps.filter.outputs.frontend == 'true'
       uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
@@ -60,11 +54,9 @@ jobs:
         cache-dependency-path: './frontend/package-lock.json'
         
     - name: Install dependencies - frontend
-      if: steps.filter.outputs.frontend == 'true'
       working-directory: ./frontend
       run: npm ci --silent
     
     - name: Run tests - frontend
-      if: steps.filter.outputs.frontend == 'true'
       working-directory: ./frontend
       run: npm run test
