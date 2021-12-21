@@ -18,7 +18,7 @@ route.get("/", async (_, res) => {
 })
 
 /**
- * Endpoint to start a new solver job
+ * Endpoint to add a new solver
  */
 route.post("/", async (req, res) => {
     const body = req.body;
