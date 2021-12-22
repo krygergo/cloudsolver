@@ -109,7 +109,7 @@ route.delete("/:solverName", async (req, res) => {
     return res.status(200).send("Solver deleted");
 })
 
-route.post("/:solverName/flagFile", async (req, res) => {
+route.post("/:solverName/flagFile", fileUpload(defaultFileUploadConfig) , async (req, res) => {
     if(!req.files)
         return res.status(400).send("No files specified");
 
