@@ -57,7 +57,9 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     if (!verifiedSolverFile.status)
         return res.status(400).send(verifiedSolverFile.message);
 
-    const namesMatch = solverFile!.name.slice(0, ".tar.gz".length) === flagFile!.name.slice(0, -".txt".length);
+    const namesMatch = solverFile!.name.slice(0, -".tar.gz".length) === flagFile!.name.slice(0, -".txt".length);
+  
+    
     if(!namesMatch)
         return res.status(400).send("Names of the files must match");
 
