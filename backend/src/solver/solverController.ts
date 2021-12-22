@@ -33,7 +33,7 @@ route.post("/", async (req, res) => {
         return res.status(400).send("Solvers field must be of type array");
     console.log(body.config)
     const solverJob = (await SolverService(req.session.userId!).startSolverJob(
-        body.mznFileId, body.dznFileId, body.solvers, body.memoryMax, body.vCPUMax, body.config?jsonify(body.config):{}
+        body.mznFileId, body.dznFileId, body.solvers, body.memoryMax, body.vCPUMax, body.config
     ));
     if(solverJob.code !== 0)
         return res.status(400).send(solverJob.message);
