@@ -12,7 +12,7 @@ export const verifyFlagFile = (flagfile: UploadedFile) => {
         return { status: false, message: "You can only upload one flagtext file at once." };
     if (flagfile.name.length <= ".txt".length)
         return { status: false, message: "The flag text file must have a name!" };
-    if (flagfile.name.slice(flagfile.name.length - ".txt".length) !== "txt")
+    if (flagfile.name.slice(flagfile.name.length - ".txt".length) !== ".txt")
         return { status: false, message: "The file extension must be .txt" };
     return { status: true, message: "success!" }
 }
