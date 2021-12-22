@@ -84,10 +84,6 @@ route.get("/:solverName/flagFile", async (req, res) => {
  * Endpoint for updating the data of an existing flag file
  */
 route.put("/:solverName/flagFile", async (req, res) => {
-    const body = req.body;
-    if(!body)
-        return res.status(400).send("No body specified");
-    
     const newData = req.body.data;
     if(!newData)
         return res.status(400).send("No data specified");

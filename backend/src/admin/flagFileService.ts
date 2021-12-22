@@ -38,7 +38,7 @@ export const verifySolverFile = (solverFile: UploadedFile) => {
 
     const getFile = async () => {
         const fileSnapshot = await query.get();
-        if(!fileSnapshot.empty)
+        if(fileSnapshot.empty)
             return undefined;
         return fileSnapshot.docs[0].data()!;
     }
