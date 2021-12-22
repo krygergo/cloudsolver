@@ -9,6 +9,7 @@ export interface SolverFlag {
     createdAt: number
     updatedAt: number
 }
+
 const solverConverter: FirestoreDataConverter<SolverFlag> = {
     toFirestore(SolverFlag: SolverFlag) {
         return SolverFlag;
@@ -17,7 +18,6 @@ const solverConverter: FirestoreDataConverter<SolverFlag> = {
         return snapshot.data() as SolverFlag;
     }
 }
-
 
 export const SolverFlagCollection = () => firestore()
     .collection("SolverFlag")

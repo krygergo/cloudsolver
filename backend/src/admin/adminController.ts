@@ -4,11 +4,9 @@ import fileUpload from "express-fileupload";
 import { addSolverFile } from "../solver/file/solverFileService";
 import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
 import { auth } from "../auth/auth";
-import { UploadedFile } from "express-fileupload"
-import firestore from "../config/database/googleFirestore";
 import { SolverFlagCollection } from "./flagFileModel";
 import { v4 as uuid } from "uuid";
-import { SolverService } from "../solver/solverService";
+import { verifySolverFile, verifyFlagFile, fileByName } from "./flagFileService";
 
 const route = Router();
 
@@ -38,51 +36,6 @@ route.put("/user/:userId", async (req, res) => {
     const updated = await updateUserResourcesById(req.params.userId, req.body.vCPUMax, req.body.memoryMax);
     updated ? res.sendStatus(200) : res.sendStatus(400);
 });
-/**
- * get,update and delete flagfiles
- */
-const fileByName = (filename: string) => {
-    const solvercollection = SolverFlagCollection()
-    const query = solvercollection.where("name", "==", filename);
-    //const document = SolverFlagCollection().doc(filename);
-
-    const getFile = async () => {
-        const fileSnapshot = await query.get();
-        if(!fileSnapshot.empty)
-            return undefined;
-        return fileSnapshot.docs[0].data()!;
-    }
-
-    const updateFileData = async (input: string) => {
-        const file = await getFile();
-        if(!file)
-            return undefined;
-        return solvercollection.doc(file.id).update({data : input})
-    }
-/**
- * verify files
- */
-
-const verifyFlagFile = (flagfile: UploadedFile) => {
-    const myFlagFile = asSingleFile(flagfile);
-    if (!flagfile)
-        return { status: false, message: "You can only upload one flagtext file at once." };
-    if (flagfile.name.length <= ".txt".length)
-        return { status: false, message: "The flag text file must have a name!" };
-    if (flagfile.name.slice(flagfile.name.length - ".txt".length) !== "txt")
-        return { status: false, message: "The file extension must be .txt" };
-    return { status: true, message: "success!" }
-}
-const verifySolverFile = (solverFile: UploadedFile) => {
-    const mySolverFile = asSingleFile(solverFile);
-    if (!mySolverFile)
-        return { status: false, message: "You can only upload one solver file at once." };
-    if (mySolverFile.name.length <= ".txt".length)
-        return { status: false, message: "The solverfile must have a name!" };
-    if (mySolverFile.name.slice(mySolverFile.name.length - ".tar.gz".length) !== ".tar.gz")
-        return { status: false, message: "The file extension must be .tar.gz" };
-    return { status: true, message: "success!" }
-}
 
 /**
  * Endpoint for adding a new solver to the platform
@@ -118,7 +71,44 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
     return res.status(201).send("Successfully uploaded the solverfile & flagfile.");
 });
 
-route.get("/solverflag",)
+/**
+ * Endpoint for retrieving a flag file
+ */
+route.get("/:solverName/flagFile", async (req, res) => {
+    const flagFile = await fileByName(req.params.solverName).getFile();
+    if(!flagFile)
+        return res.status(404).send("Solver not supported");
+    return res.send(flagFile);
+})
 
+/**
+ * Endpoint for updating the data of an existing flag file
+ */
+route.put("/:solverName/fileFlag", async (req, res) => {
+    const newData = req.body.data;
+    if(!newData)
+        return res.status(400).send("No data specified");
+
+    const fileExists = await fileByName(req.params.solverName).getFile();
+    if(!fileExists)
+        return res.status(404).send("Flag file does not exist");
+
+    const updated = await fileByName(req.params.solverName).updateFileData(newData);
+    if(!updated)
+        return res.status(400).send("Something went wrong when updating the file");
+
+    return res.status(200).send("Successfully updated the file");
+})
+
+/**
+ * Endpoint for deleting a solver and its flag file
+ */
+route.delete("/:solverName", async (req, res) => {
+    const deleted = await fileByName(req.params.solverName).deleteFile();
+    if(!deleted)
+        return res.status(400).send("Flag file could not be deleted");
+    // TODO remove the solver image from artifact registry
+    return res.status(200).send("Solver deleted");
+})
 
 export default route;
