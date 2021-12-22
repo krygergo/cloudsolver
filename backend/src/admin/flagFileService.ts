@@ -21,7 +21,7 @@ export const verifySolverFile = (solverFile: UploadedFile) => {
     const mySolverFile = asSingleFile(solverFile);
     if (!mySolverFile)
         return { status: false, message: "You can only upload one solver file at once." };
-    if (mySolverFile.name.length <= ".txt".length)
+    if (mySolverFile.name.length <= ".tar.gz".length)
         return { status: false, message: "The solverfile must have a name!" };
     if (mySolverFile.name.slice(mySolverFile.name.length - ".tar.gz".length) !== ".tar.gz")
         return { status: false, message: "The file extension must be .tar.gz" };

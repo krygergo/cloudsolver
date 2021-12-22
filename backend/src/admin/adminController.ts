@@ -110,11 +110,10 @@ route.delete("/:solverName", async (req, res) => {
 })
 
 route.post("/:solverName/flagFile", async (req, res) => {
-    const files = req.files;
-    if(!files)
+    if(!req.files)
         return res.status(400).send("No files specified");
 
-    const flagFile = asSingleFile(files.flagFile);
+    const flagFile = asSingleFile(req.files.flagFile);
     if(!flagFile)
         return res.status(400).send("You must specifiy exactly one flag file");
 
