@@ -56,6 +56,11 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
         return res.status(400).send(verifiedFlagFile.message);
     if (!verifiedSolverFile.status)
         return res.status(400).send(verifiedSolverFile.message);
+
+    const namesMatch = solverFile!.name.slice(0, ".tar.gz".length) === flagFile!.name.slice(0, -".txt".length);
+    if(!namesMatch)
+        return res.status(400).send("Names of the files must match");
+
     if (!await addSolverFile(solverFile!))
         return res.status(400).send("The file already exists or an unexpected error occured.");
 
@@ -78,7 +83,11 @@ route.get("/:solverName/flagFile", async (req, res) => {
 /**
  * Endpoint for updating the data of an existing flag file
  */
-route.put("/:solverName/fileFlag", async (req, res) => {
+route.put("/:solverName/flagFile", async (req, res) => {
+    const body = req.body;
+    if(!body)
+        return res.status(400).send("No body specified");
+    
     const newData = req.body.data;
     if(!newData)
         return res.status(400).send("No data specified");
@@ -117,6 +126,7 @@ route.post("/:solverName/flagFile", fileUpload(defaultFileUploadConfig) , async 
     if(!flagFile)
         return res.status(400).send("You must specifiy exactly one flag file");
 
+    flagFile.name = flagFile.name.slice(0, -".txt".length);
     const uploaded = await uploadNewFlagFile(flagFile);
     if(!uploaded)
         return res.status(400).send("Could not upload the flag file");
