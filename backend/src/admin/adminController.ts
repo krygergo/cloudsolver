@@ -6,9 +6,12 @@ import { asSingleFile, defaultFileUploadConfig } from "../config/fileConfig";
 import { auth } from "../auth/auth";
 import { SolverFlagCollection } from "./flagFileModel";
 import { v4 as uuid } from "uuid";
-import { verifySolverFile, verifyFlagFile, fileByName } from "./flagFileService";
+import { verifySolverFile, verifyFlagFile, fileByName, uploadNewFlagFile } from "./flagFileService";
+import { ArtifactRegistryService } from "../google/artifactRegistryService";
 
 const route = Router();
+
+const artifactRegistryService = ArtifactRegistryService("europe", "eu.gcr.io");
 
 const verifyAdmin = async (req: Request, res: Response, next: NextFunction) => {
     if (!await verifyUserAdminRight(req.session.userId!))
@@ -55,19 +58,10 @@ route.post("/solver", fileUpload(defaultFileUploadConfig), async (req, res) => {
         return res.status(400).send(verifiedSolverFile.message);
     if (!await addSolverFile(solverFile!))
         return res.status(400).send("The file already exists or an unexpected error occured.");
-    const solverFileId = uuid()
-    const solverFlagFile = {
-        id: solverFileId,
-        name: flagFile!.name,
-        data: flagFile!.data.toString(),
-        size: flagFile!.size,
-        createdAt: Date.now(),
-        updatedAt: Date.now()
-    }
-    const flagSnapshot = await SolverFlagCollection().where("name", "==", solverFlagFile.name).get();
-    if(!flagSnapshot.empty)
-        return res.status(400).send("The file already exists or an unexpected error occured.");
-    SolverFlagCollection().doc(solverFileId).set(solverFlagFile)
+
+    const uploaded = await uploadNewFlagFile(flagFile!);
+    if(!uploaded)
+        return res.status(400).send("Could not upload flag file");
     return res.status(201).send("Successfully uploaded the solverfile & flagfile.");
 });
 
@@ -104,11 +98,31 @@ route.put("/:solverName/fileFlag", async (req, res) => {
  * Endpoint for deleting a solver and its flag file
  */
 route.delete("/:solverName", async (req, res) => {
+    // can not delete flag files for existing solvers. To avoid a solver without a flag file
+    const images = await artifactRegistryService.getAllImages();
+    if(images.includes(req.params.solverName))
+        return res.status(400).send("Cannot remove flag file for an existing solver");
+
     const deleted = await fileByName(req.params.solverName).deleteFile();
     if(!deleted)
         return res.status(400).send("Flag file could not be deleted");
-    // TODO remove the solver image from artifact registry
     return res.status(200).send("Solver deleted");
+})
+
+route.post("/:solverName/flagFile", async (req, res) => {
+    const files = req.files;
+    if(!files)
+        return res.status(400).send("No files specified");
+
+    const flagFile = asSingleFile(files.flagFile);
+    if(!flagFile)
+        return res.status(400).send("You must specifiy exactly one flag file");
+
+    const uploaded = await uploadNewFlagFile(flagFile);
+    if(!uploaded)
+        return res.status(400).send("Could not upload the flag file");
+
+    return res.status(200).send("Flag file uploaded");
 })
 
 export default route;

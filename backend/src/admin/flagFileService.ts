@@ -1,6 +1,7 @@
 import { UploadedFile } from "express-fileupload";
 import { asSingleFile } from "../config/fileConfig";
-import { SolverFlagCollection } from "./flagFileModel";
+import { SolverFlag, SolverFlagCollection } from "./flagFileModel";
+import { v4 as uuid } from "uuid";
 
 /**
  * verify files
@@ -61,4 +62,21 @@ export const verifySolverFile = (solverFile: UploadedFile) => {
         updateFileData,
         deleteFile
     }
+}
+
+export const uploadNewFlagFile = async (flagFile: UploadedFile) => {
+    const solverFileId = uuid()
+    const solverFlagFile = {
+        id: solverFileId,
+        name: flagFile!.name,
+        data: flagFile!.data.toString(),
+        size: flagFile!.size,
+        createdAt: Date.now(),
+        updatedAt: Date.now()
+    }
+
+    const flagSnapshot = await SolverFlagCollection().where("name", "==", solverFlagFile.name).get();
+    if(!flagSnapshot.empty)
+        return undefined
+    return SolverFlagCollection().doc(solverFileId).set(solverFlagFile)
 }
