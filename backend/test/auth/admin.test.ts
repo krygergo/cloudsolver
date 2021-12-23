@@ -438,25 +438,3 @@ describe("/put updating a user's maximum amount of vCPUs and memory", () => {
         expect(res2.statusCode).toBe(200)
     });
 })
-
-/*
-describe("Testing PUT request for /:solverName/flagFile", () => {
-    it("Added existing solverfile", async () => {
-        const req = {
-            "username" : "adminUser",
-            "password" : "correctPass",
-            }
-        const res = await supertest(app)
-        .post("/login")
-        .send(req);
-        admin = true
-        const cookie = res.header["set-cookie"][1] as string;
-        const filePath = "../backend/test/testfiles/newfile.tar.gz";
-        const filePath2 = "../backend/test/testfiles/newfile.txt";
-        const res2 = await supertest(app).post("/admin/solver").attach("solverfile", filePath).attach("flagfile", filePath2).field(req).set('Cookie', cookie)
-        console.log(res2)
-    })
-    */
-
-
-
