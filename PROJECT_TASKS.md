@@ -19,7 +19,7 @@
 * monitor and log the platform using a dashboard (Complete - done via the google framework)
 * kill all solver executions started by a user (Complete)
 * set resources quota to users (e.g., no more than 6 vCPUs in total) (Complete)
-* delete a user and all its material
+* delete a user and all its material(Complete - works via end points - no GUI support.)
 * deploy the system and add new computing nodes in an easy way (Complete - done via google)
 * add or remove a solver. It is possible to assume that the solver to add satisfy the submission rules of the MiniZinc challenge (note also that you have to handle
   the case when a users asks to use a removed solver) (Complete)
