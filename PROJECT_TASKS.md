@@ -1,7 +1,7 @@
 * create its own profile that can be access with a username and password(Complete)
 * Create, read, update and delete a .mzn instance (Complete)
 * Create, read, update and delete a .dzn instance (Complete)
-* list the name of the solvers supported and their configuration options (Partially Complete - does not list in GUI what the options are)
+* list the name of the solvers supported and their configuration options (Partially Complete - does not list in GUI what the options are, but can be reached with endpoints.)
   (e.g., free search, return all solutions, ...) 
 * trigger the execution of a solver giving the id of the mzn and dzn instances (Complete)
   (only mzn if dzn is not needed), selecting the solver to use and its options,
