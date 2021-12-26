@@ -3,7 +3,7 @@ on:
   pull_request:
     types: [ closed ]
     branches: [ main ]
-    paths: [ src, package*.json, tsconfig.json ]
+    paths: [ backend/src ]
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
