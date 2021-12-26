@@ -29,9 +29,6 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     
-    - name: Go to backend
-      run: cd backend
-    
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@master
       with: 
@@ -45,15 +42,18 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './package-lock.json'
+        cache-dependency-path: './backend/package-lock.json'
         
     - name: Install dependencies
+      working-directory: backend
       run: npm ci --silent
     
     - name: Compile src code
+      working-directory: backend
       run: npm run build
     
     - name: Build docker image
+      working-directory: backend
       run: |-
         docker build -f Dockerfile.production \
         --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
