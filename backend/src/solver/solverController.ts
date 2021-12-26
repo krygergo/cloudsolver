@@ -55,7 +55,7 @@ route.get("/job/listen", (req, res) => {
 });
 
 /**
- * Endpoint to delete a job for the current user
+ * Endpoint to delete a job for the current user.
  */
 route.delete("/job/:jobId", (req, res) => {
     JobService(req.session.userId!).deleteJob(req.params.jobId);
