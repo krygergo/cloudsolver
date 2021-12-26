@@ -50,7 +50,7 @@ step 12: Apply the ingress. The ingress maps the specified urls to a service. Th
          
 Step 13: For setting up the pipeline refer to the .github folder, and to set it up simply make a github repository.
 
-step 14: To upload a solver use look at the endpoints and add a .tar file which has a docker file for the installing the solver image. It should also get a txt file which contains the flags. e.g:
+step 14: To upload a solver POST to the endpoint /admin/solver and give as form data a .tar.gz file, which contains a folder with a docker file for the installation of the solver image, and a .txt file, which contains the flags for the solver. The files must have the same name. For example:
 Endpoint: api.cloudsolver.xyz/admin/solver
 Method: POST
 solverfile: x.tar.gz
