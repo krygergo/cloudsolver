@@ -10,7 +10,7 @@ on:
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  LOCATION: europe-north1-a
+  LOCATION: europe-north1
   REPOSITORY: backend
   IMAGE: express
   GKE_CLUSTER: cloudsolver-gke
@@ -56,17 +56,17 @@ jobs:
       working-directory: backend
       run: |-
         docker build -f Dockerfile.production \
-        --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:$GITHUB_SHA" \
+        --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
         .
 
     - name: Publish to artifact registry
-      run: docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:$GITHUB_SHA"
+      run: docker push "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
 
     - name: Connect to cluster
       uses: google-github-actions/get-gke-credentials@main
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
-        location: ${{ env.LOCATION }}
+        location: ${{ env.LOCATION }}-a
         credentials: ${{ secrets.GKE_SA_KEY }}
     
     - name: Add commit hash
@@ -76,4 +76,3 @@ jobs:
         
     - name: Deploy
       run: kubectl apply -f .github/kubernetes/backend
-      
