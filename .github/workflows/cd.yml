@@ -56,11 +56,11 @@ jobs:
       working-directory: backend
       run: |-
         docker build -f Dockerfile.production \
-        --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
+        --tag "europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:$GITHUB_SHA" \
         .
 
     - name: Publish to artifact registry
-      run: docker push "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA"
+      run: docker push "europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:$GITHUB_SHA"
 
     - name: Connect to cluster
       uses: google-github-actions/get-gke-credentials@main
