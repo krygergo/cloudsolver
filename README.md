@@ -47,3 +47,5 @@ step 12: Apply the ingress. The ingress maps the specified urls to a service. Th
          TLS communication because the initial connection for the certificate must be on a http connection because the https connection
          do not exist yet. If the certificate is not active within 5 minutes. Delete the frontend config and the certificate will
          become active and then reapply the frontend config to only use https connections.
+         
+Step 13: For setting up the pipeline refer to the .github folder, and to set it up simply make a github repository.
