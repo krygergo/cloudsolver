@@ -13,7 +13,7 @@ env:
   LOCATION: europe-north1-a
   REPOSITORY: backend
   IMAGE: express
-  GKE_CLUSTER: cloudsolver
+  GKE_CLUSTER: cloudsolver-gke
   
 jobs:
   deployment:
@@ -71,9 +71,9 @@ jobs:
     
     - name: Add commit hash
       run: |-
-        envsubst < .github/kubernetes/deployment.yml > temp_file
-        mv temp_file .github/kubernetes/deployment.yml
+        envsubst < .github/kubernetes/backend/deployment.yml > temp_file
+        mv temp_file .github/kubernetes/backend/deployment.yml
         
     - name: Deploy
-      run: kubectl apply -f .github/kubernetes
+      run: kubectl apply -f .github/kubernetes/backend
       
