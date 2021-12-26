@@ -1,20 +1,19 @@
 * create its own profile that can be access with a username and password(Complete)
 * Create, read, update and delete a .mzn instance (Complete)
 * Create, read, update and delete a .dzn instance (Complete)
-* list the name of the solvers supported and their configuration options (Partially Complete - does not list in GUI what the options are, but can be reached with endpoints.)
-  (e.g., free search, return all solutions, ...) 
-* trigger the execution of a solver giving the id of the mzn and dzn instances (Complete)
+* list the name of the solvers supported and their configuration options (e.g., free search, return all solutions, ...) (Partially Complete - does not list in GUI what the options are, but can be reached with endpoints.)
+* trigger the execution of a solver giving the id of the mzn and dzn instances 
   (only mzn if dzn is not needed), selecting the solver to use and its options,
-  the timeout, maximal amount of memory that can be used, vCPUs to use
-* trigger the execution in parallel of more solvers terminating the other solvers (Complete)
-  when the quickest solver terminates 
+  the timeout, maximal amount of memory that can be used, vCPUs to use (Complete)
+* trigger the execution in parallel of more solvers terminating the other solvers 
+  when the quickest solver terminates (Complete)
 * monitor the termination state of the solver execution (Complete)
-* given a computaton request, retrieve its result if terminated, what solver (Complete)
-  manage to solve it first and the time it took to solve it
-* cancel the execution of a computation request (terminate the solver if (Complete)
-  running, delete the result otherwise)
-* bulk execution of various instances to be solved with a set of solvers in (Complete)
-  parallel
+* given a computaton request, retrieve its result if terminated, what solver 
+  manage to solve it first and the time it took to solve it (Complete)
+* cancel the execution of a computation request (terminate the solver if 
+  running, delete the result otherwise) (Complete)
+* bulk execution of various instances to be solved with a set of solvers in 
+  parallel (Complete)
 * GUI support (optional for group with less than 6 people) (Partially Complete)
 
 * monitor and log the platform using a dashboard (Complete - done via the google framework)
@@ -31,8 +30,8 @@
 * scalable, supporting multiple users exploiting if needed more resources in the (Partially Complete - done via input rather than the -p parameter)
   cloud (note: vcpus allocated to a run depending on the parameter "-p")
 * have tests to test the system (unit test, integration, ...) (Complete)
-* security (proper credential management and common standard security practices (Complete)
-  enforced)
+* security (proper credential management and common standard security practices 
+  enforced) (Complete)
 * provide user stories to explain how the system is intended to be use (Complete)
 * provide minimal documentation to deploy and run the system (Complete)
 * fairness: if the resources do not allow to run all the solvers at the same time (Complete - Users jobs are qeued if they exceed resource limits)
