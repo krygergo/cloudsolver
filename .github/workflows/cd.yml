@@ -29,6 +29,9 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
     
+    - name: Go to backend
+      run: cd backend
+    
     - name: Setup gcloud
       uses: google-github-actions/setup-gcloud@master
       with: 
@@ -42,9 +45,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    
-    - name: Go to backend
-      run: cd backend && ls
         
     - name: Install dependencies
       run: npm ci --silent
