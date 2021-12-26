@@ -49,3 +49,5 @@ step 12: Apply the ingress. The ingress maps the specified urls to a service. Th
          become active and then reapply the frontend config to only use https connections.
          
 Step 13: For setting up the pipeline refer to the .github folder, and to set it up simply make a github repository.
+
+step 14: To start a job on the frontend https://cloudsolver.xyz/ simply select a mzn and dzn file, a solver or more and then you can run it.
