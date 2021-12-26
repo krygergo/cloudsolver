@@ -50,4 +50,12 @@ step 12: Apply the ingress. The ingress maps the specified urls to a service. Th
          
 Step 13: For setting up the pipeline refer to the .github folder, and to set it up simply make a github repository.
 
-step 14: To start a job on the frontend https://cloudsolver.xyz/ simply select a mzn and dzn file, a solver or more and then you can run it.
+step 14: To upload a solver use look at the endpoints and add a .tar file which has a docker file for the installing the solver image. It should also get a txt file which contains the flags. e.g:
+Endpoint: api.cloudsolver.xyz/admin/solver
+Method: POST
+solverfile: x.tar.gz
+flagfile: x.txt
+
+step 15: To start a job on the frontend https://cloudsolver.xyz/ simply select a mzn and dzn file, a solver or more and then you can run it.
+
+
