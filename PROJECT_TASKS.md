@@ -1,4 +1,4 @@
-* create its own profile that can be access with a username and password(Complete)
+* create its own profile that can be access with a username and password (Complete)
 * Create, read, update and delete a .mzn instance (Complete)
 * Create, read, update and delete a .dzn instance (Complete)
 * list the name of the solvers supported and their configuration options (e.g., free search, return all solutions, ...) (Partially Complete - does not list in GUI what the options are, but can be reached with endpoints.)
@@ -21,9 +21,8 @@
 * set resources quota to users (e.g., no more than 6 vCPUs in total) (Complete)
 * delete a user and all its material
 * deploy the system and add new computing nodes in an easy way (Complete - done via google)
-* add or remove a solver. It is possible to assume that the solver to add (Complete)
-  satisfy the submission rules of the MiniZinc challenge (note also that you have to handle
-  the case when a users asks to use a removed solver)
+* add or remove a solver. It is possible to assume that the solver to add satisfy the submission rules of the MiniZinc challenge (note also that you have to handle
+  the case when a users asks to use a removed solver) (Complete)
   
  * Use continuous integration and deployment (Complete)
 * Infrastructure as a Code with an automatic DevOps pipeline (Complete)
