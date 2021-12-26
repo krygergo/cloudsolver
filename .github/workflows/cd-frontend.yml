@@ -1,17 +1,17 @@
-name: CD
+name: CD - Frontend
 on:
   push:
     branches: [ main ]
    
-#  pull_request:
-#    types: [ closed ]
-#    branches: [ main ]
-#    paths: [ backend/src ]
+  pull_request: 
+    types: [ closed ]
+    branches: [ main ]
+    paths: [ frontend/src ]
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   LOCATION: europe-north1
-  REPOSITORY: backend
+  REPOSITORY: frontend
   IMAGE: express
   GKE_CLUSTER: cloudsolver-gke
   
@@ -42,18 +42,18 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-        cache-dependency-path: './backend/package-lock.json'
+        cache-dependency-path: './frontend/package-lock.json'
         
     - name: Install dependencies
-      working-directory: backend
+      working-directory: frontend
       run: npm ci --silent
     
     - name: Compile src code
-      working-directory: backend
+      working-directory: frontend
       run: npm run build
     
     - name: Build docker image
-      working-directory: backend
+      working-directory: frontend
       run: |-
         docker build -f Dockerfile.production \
         --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/$REPOSITORY/$IMAGE:$GITHUB_SHA" \
@@ -71,8 +71,8 @@ jobs:
     
     - name: Add commit hash
       run: |-
-        envsubst < .github/kubernetes/backend/deployment.yml > temp_file
-        mv temp_file .github/kubernetes/backend/deployment.yml
+        envsubst < .github/kubernetes/frontend/deployment.yml > temp_file
+        mv temp_file .github/kubernetes/frontend/deployment.yml
         
     - name: Deploy
-      run: kubectl apply -f .github/kubernetes/backend
+      run: kubectl apply -f .github/kubernetes/frontend
