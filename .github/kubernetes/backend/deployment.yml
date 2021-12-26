@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: express
-        image: europe-west1-docker.pkg.dev/cloudsolver-334113/backend/express:${GITHUB_SHA}
+        image: europe-north1-docker.pkg.dev/cloudsolver-334113/backend/express:${GITHUB_SHA}
         ports:
         - containerPort: 3000
         volumeMounts:
@@ -34,9 +34,9 @@ spec:
                 name: express-cookie-secret
                 key: secret
           - name: EXPRESS_GCP_PROJECT_NAME
-            value:
+            value: "cloudsolver-334113"
           - name: EXPRESS_GCP_AR_REGION
-            value:
+            value: "europe-north1"
       volumes:
       - name: keys
         secret:
