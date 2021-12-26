@@ -4,7 +4,6 @@ const client = googleEngineClusterManager();
 
 export const nodeQuantity = async () => {
     const [nodePools] = await client.listNodePools({});
-    console.log("HERE!!!")
     console.log(nodePools)
     return nodePools.nodePools?.length;
 }
