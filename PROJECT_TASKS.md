@@ -14,7 +14,7 @@
   running, delete the result otherwise) (Complete)
 * bulk execution of various instances to be solved with a set of solvers in 
   parallel (Complete)
-* GUI support (optional for group with less than 6 people) (Partially Complete)
+* GUI support (optional for group with less than 6 people) (Partially Complete - Admin related work largly done on google cloud and end points.)
 
 * monitor and log the platform using a dashboard (Complete - done via the google framework)
 * kill all solver executions started by a user (Complete)
