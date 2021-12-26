@@ -2,11 +2,12 @@ name: CD - Frontend
 on:
   push:
     branches: [ main ]
+    paths: [ frontend/src/** ]
    
   pull_request: 
     types: [ closed ]
     branches: [ main ]
-    paths: [ frontend/src ]
+    paths: [ frontend/src/** ]
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
