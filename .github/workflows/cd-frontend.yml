@@ -12,7 +12,7 @@ env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   LOCATION: europe-north1
   REPOSITORY: frontend
-  IMAGE: express
+  IMAGE: react
   GKE_CLUSTER: cloudsolver-gke
   
 jobs:
