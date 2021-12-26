@@ -18,7 +18,7 @@ step 2: Enable following API's
 
 step 3: Create a kubernetes cluster
 
-step 4: Create backend, frontend, solver and eu.gcr.io repositories. We recommend routing the eu.gcr.io repositories to a artifact repository. 
+step 4: Create backend, frontend, solver and eu.gcr.io repositories. We recommend routing the eu.gcr.io repositories to a artifact repository. The naming convention should be that of the project ID.
 
 step 5: Create a static external ipv4 address named cloudsolver-static-ip
 
