@@ -33,6 +33,10 @@ spec:
               secretKeyRef:
                 name: express-cookie-secret
                 key: secret
+          - name: EXPRESS_GCP_PROJECT_NAME
+            value:
+          - name: EXPRESS_GCP_AR_REGION
+            value:
       volumes:
       - name: keys
         secret:

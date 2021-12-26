@@ -5,6 +5,8 @@ export interface Environment {
     NODE_ENV: string
     EXPRESS_COOKIE_SECRET: string
     EXPRESS_ALLOW_ORIGIN: string
+    EXPRESS_GCP_PROJECT_NAME: string
+    EXPRESS_GCP_AR_REGION: string
 }
 
 declare global {

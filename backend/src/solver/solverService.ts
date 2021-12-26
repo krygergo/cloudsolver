@@ -6,6 +6,7 @@ import { FileService } from "../user/file/fileService";
 import { getUserById } from "../user/userService";
 import firestore from "../config/database/googleFirestore";
 import { Job } from "../user/job/jobModel";
+import { env } from "../config/environment";
 
 export const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: number, vCPUMax: number): V1Job => ({
     apiVersion: "batch/v1",
@@ -18,7 +19,7 @@ export const solverPodJob = (userId: string, jobId: string, solver: string, memo
             spec: {
                 initContainers: [{
                     name: "fileinput",
-                    image: "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/input",
+                    image: `${env.EXPRESS_GCP_AR_REGION}-docker.pkg.dev/${env.EXPRESS_GCP_PROJECT_NAME}/solver/input`,
                     command: [
                         "node"
                     ],
@@ -42,7 +43,7 @@ export const solverPodJob = (userId: string, jobId: string, solver: string, memo
                 }],
                 containers: [{
                     name: "minizinc",
-                    image: `eu.gcr.io/cloudsolver-334113/${solver}`,
+                    image: `eu.gcr.io/${env.EXPRESS_GCP_PROJECT_NAME}/${solver}`,
                     resources: {
                         limits: {
                             memory:`${memoryMax}Mi`,
@@ -63,7 +64,7 @@ export const solverPodJob = (userId: string, jobId: string, solver: string, memo
                     }]
                 }, {
                     name: "fileoutput",
-                    image: "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/output",
+                    image: `${env.EXPRESS_GCP_AR_REGION}-docker.pkg.dev/${env.EXPRESS_GCP_PROJECT_NAME}/solver/output`,
                     command: [
                         "node"
                     ],

@@ -8,8 +8,8 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   LOCATION: europe-west1
-  REPOSITORY: gateway
-  IMAGE: gateway_prod
+  REPOSITORY: backend
+  IMAGE: express
   GKE_CLUSTER: cloudsolver
   
 jobs:
