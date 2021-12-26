@@ -6,7 +6,7 @@ The deployment exists of a frontend and a backend image. Which is build based on
 
 To run the system
 
-step 1: Create a GCP (google cloud platform) project
+step 1: Create a GCP (google cloud platform) project - we recommend to use europe-west1 for all the API's
 
 step 2: Enable following API's
  - Kubernetes engine
@@ -36,7 +36,8 @@ step 9: build the frontend and backend images and send them to there correspondi
         images must be the exact same path as the artifact registry when pushing. Then build the input and output images the same
         way.
 
-step 10: Apply the deployments and service kubernetes objects specified in the .github/kubernetes folder.
+step 10: Apply the deployments and service kubernetes objects specified in the .github/kubernetes folder. Before deploying remember
+         to specify the environment variables in the deployment file, for the system to work properly.
 
 step 11: Apply the managed certification object, which maps a certification to the specified urls and grants secure TLS communication
          over https.
