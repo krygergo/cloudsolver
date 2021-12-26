@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: react
-        image: europe-west1-docker.pkg.dev/cloudsolver-334113/frontend/react:${GITHUB_SHA}
+        image: europe-north1-docker.pkg.dev/cloudsolver-334113/frontend/react:${GITHUB_SHA}
         ports:
         - containerPort: 3000
