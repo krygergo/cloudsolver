@@ -1,8 +1,9 @@
 import googleArtifactRegistry from "../config/googleArtifactRegistry"
+import { env } from "../config/environment"
 
 export const ArtifactRegistryService = (location: string, repository: string) => {
     const artifactRegistry = googleArtifactRegistry();
-    const repositoryPath = artifactRegistry.repositoryPath("cloudsolver-334113", location, repository);
+    const repositoryPath = artifactRegistry.repositoryPath(`${env.EXPRESS_GCP_PROJECT_NAME}`, location, repository);
 
     const getAllImages = async () => {
         const [images] = await artifactRegistry.listPackages({

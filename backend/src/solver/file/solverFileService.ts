@@ -3,8 +3,10 @@ import storage from "../../config/googleStorage"
 import { PassThrough } from "stream"
 import k8s from "../../config/kubernetes"
 import { V1Job } from "@kubernetes/client-node";
+import { env } from "../../config/environment";
 
-const bucket = storage().bucket("cloudsolver-334113.appspot.com");
+const bucket_root = `${env.EXPRESS_GCP_PROJECT_NAME}.appspot.com`
+const bucket = storage().bucket(bucket_root);
 
 const kanikoJob = (solvername: string): V1Job => ({
     apiVersion: "batch/v1",
@@ -20,8 +22,8 @@ const kanikoJob = (solvername: string): V1Job => ({
                     image: "gcr.io/kaniko-project/executor:edge",
                     args: [
                         "--dockerfile=./Dockerfile",
-                        `--context=gs://cloudsolver-334113.appspot.com/solvers/${solvername}.tar.gz`,
-                        `--destination=eu.gcr.io/cloudsolver-334113/${solvername}:latest`
+                        `--context=gs://${bucket_root}/solvers/${solvername}.tar.gz`,
+                        `--destination=eu.gcr.io/${env.EXPRESS_GCP_PROJECT_NAME}/${solvername}:latest`
                     ],
                     volumeMounts: [{
                         name: "keys",
