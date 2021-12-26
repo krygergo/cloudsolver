@@ -13,7 +13,7 @@ env:
   LOCATION: europe-north1-a
   REPOSITORY: backend
   IMAGE: express
-  GKE_CLUSTER: cloudsolver
+  GKE_CLUSTER: cloudsolver-gke
   
 jobs:
   deployment:
