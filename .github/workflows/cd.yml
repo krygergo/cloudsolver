@@ -2,7 +2,7 @@ name: CD
 on:
   push:
     branches: [ main ]
-    paths: [ backend/src ]
+    paths: [ backend/src/** ]
    
 #  pull_request:
 #    types: [ closed ]
