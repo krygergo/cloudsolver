@@ -50,7 +50,7 @@ jobs:
     
     - name: Compile src code
       working-directory: frontend
-      run: npm run build
+      run: CI=false npm run build
     
     - name: Build docker image
       working-directory: frontend
