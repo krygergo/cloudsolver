@@ -75,5 +75,5 @@ jobs:
         mv temp_file .github/kubernetes/backend/deployment.yml
         
     - name: Deploy
-      run: kubectl apply -f .github/kubernetes
+      run: kubectl apply -f .github/backend/kubernetes
       
