@@ -15,7 +15,7 @@ env:
   LOCATION_: europe-west1-b
   REPOSITORY: frontend
   IMAGE: react
-  GKE_CLUSTER: cloudsolver-gke
+  GKE_CLUSTER: csgke
   
 jobs:
   deployment:
