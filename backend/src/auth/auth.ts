@@ -17,7 +17,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 /**
- * Attempts to log in the user
+ * Attempts to log in the user with the given username and password
  */
 export const login = (authCookie: CookieOptions) => async (req: Request, res: Response) => {
     const credentials = req.body as { username: string, password: string };
