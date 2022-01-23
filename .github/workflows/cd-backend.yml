@@ -11,7 +11,7 @@ on:
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  LOCATION: europe-north1
+  LOCATION: europe-west1
   REPOSITORY: backend
   IMAGE: express
   GKE_CLUSTER: cloudsolver-gke
