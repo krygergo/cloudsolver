@@ -4,5 +4,5 @@ metadata:
   name: cloudsolver-managed-cert
 spec:
   domains:
-    - cloudsolver.xyz
-    - api.cloudsolver.xyz
+    - cloudsolver.info
+    - api.cloudsolver.info
