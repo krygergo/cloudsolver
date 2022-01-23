@@ -25,7 +25,7 @@ spec:
           - name: GOOGLE_APPLICATION_CREDENTIALS
             value: "/keys/google-api-key.json"
           - name: EXPRESS_ALLOW_ORIGIN
-            value: "https://cloudsolver.xyz"
+            value: "https://cloudsolver.info"
           - name: NODE_ENV
             value: "prod"
           - name: EXPRESS_COOKIE_SECRET
