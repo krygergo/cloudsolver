@@ -12,6 +12,7 @@ on:
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
   LOCATION: europe-west1
+  REPOSITORY: solver
   
 jobs:
   deployment:
