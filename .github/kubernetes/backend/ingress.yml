@@ -9,7 +9,7 @@ metadata:
     networking.gke.io/v1beta1.FrontendConfig: https-redirect-config
 spec:
   rules:
-  - host: cloudsolver.xyz
+  - host: cloudsolver.info
     http:
       paths:
       - path: /*
@@ -19,7 +19,7 @@ spec:
             name: react-service
             port:
               number: 3000
-  - host: api.cloudsolver.xyz
+  - host: api.cloudsolver.info
     http:
       paths:
       - path: /*
