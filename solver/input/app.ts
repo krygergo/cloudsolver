@@ -1,7 +1,6 @@
 import { writeFileSync } from "fs";
 import { Firestore, FirestoreDataConverter, QueryDocumentSnapshot } from "@google-cloud/firestore";
 
-
 const fileBinaryConverter: FirestoreDataConverter<FileBinary> = {
     toFirestore(fileBinary: FileBinary) {
         return fileBinary;
