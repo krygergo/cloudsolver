@@ -1,0 +1,59 @@
+name: CD - Backend
+on:
+  push:
+    branches: [ main ]
+    paths: [ solver/** ]
+   
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+    paths: [ solver/** ]
+    
+env:
+  PROJECT_ID: ${{ secrets.GKE_PROJECT }}
+  LOCATION: europe-west1
+  
+jobs:
+  deployment:
+  
+    runs-on: ubuntu-latest
+    environment: production
+
+    strategy:
+      matrix:
+        node-version: [ 16.13.0 ]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Setup gcloud
+      uses: google-github-actions/setup-gcloud@master
+      with: 
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+      
+    - name: Configure docker gcloud
+      run: gcloud auth configure-docker $LOCATION-docker.pkg.dev
+    
+    - name: Setup Node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        cache-dependency-path: './solver/package-lock.json'
+        
+    - name: Install dependencies
+      working-directory: solver
+      run: npm ci --silent
+    
+    - name: Compile src code
+      working-directory: solver
+      run: npx tsc
+    
+    - name: Build and push docker images
+      working-directory: solver
+      run: |-
+        docker build --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/solver/output" --build-arg BUILDFOLDER=build/output/app.* . && \
+        docker push "$LOCATION-docker.pkg.dev/$PROJECT_ID/solver/output" && \
+        docker build --tag "$LOCATION-docker.pkg.dev/$PROJECT_ID/solver/input" --build-arg BUILDFOLDER=build/input/app.* . && \
+        docker push "$LOCATION-docker.pkg.dev/$PROJECT_ID/solver/input"
