@@ -175,7 +175,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
             spec: {
                 initContainers: [{
                     name: "fileinput",
-                    image: "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/input",
+                    image: "europe-west1-docker.pkg.dev/cloudsolver-334113/solver/input",
                     command: [
                         "node"
                     ],
@@ -220,7 +220,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                     }]
                 }, {
                     name: "fileoutput",
-                    image: "europe-north1-docker.pkg.dev/cloudsolver-334113/solver/output",
+                    image: "europe-west1-docker.pkg.dev/cloudsolver-334113/solver/output",
                     command: [
                         "node"
                     ],
