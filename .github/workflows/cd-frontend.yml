@@ -2,7 +2,8 @@ name: CD - Frontend
 on:
   push:
     branches: [ main ]
-   
+    paths: [ frontend/src/** ]
+    
   pull_request: 
     types: [ closed ]
     branches: [ main ]
