@@ -1,4 +1,4 @@
-name: CD - Backend
+name: CICD - Solver
 on:
   push:
     branches: [ main ]
