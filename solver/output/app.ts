@@ -199,7 +199,7 @@ const solverPodJob = (userId: string, jobId: string, solver: string, memoryMax: 
                 }],
                 containers: [{
                     name: "minizinc",
-                    image: `eu.gcr.io/cloudsolver-334113/${solver}`,
+                    image: `eu.gcr.io/cloudsolver-exam/${solver}`,
                     resources: {
                         limits: {
                             memory:`${memoryMax}Mi`,
