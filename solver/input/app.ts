@@ -8,7 +8,7 @@ const fileBinaryConverter: FirestoreDataConverter<FileBinary> = {
     fromFirestore(snapshot: QueryDocumentSnapshot) {
         return snapshot.data() as FileBinary;
     }
-}
+} 
 
 interface FileBinary {
     id: string
