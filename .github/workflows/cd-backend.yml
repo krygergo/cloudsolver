@@ -11,7 +11,7 @@ on:
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  LOCATION: europe-west1
+  LOCATION: europe-west1-b
   REPOSITORY: backend
   IMAGE: express
   GKE_CLUSTER: csgke
