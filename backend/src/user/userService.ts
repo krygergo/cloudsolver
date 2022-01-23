@@ -15,8 +15,8 @@ export async function addUser(username: string, password: string, userRight: Use
         hashedPassword: await bcrypt.hash(password, 10),
         userRight: userRight,
         createdAt: Date.now(),
-        vCPUMax: 100,
-        memoryMax: 200
+        vCPUMax: 500,
+        memoryMax: 500
     });
     return userId;
 }
