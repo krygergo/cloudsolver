@@ -11,7 +11,8 @@ on:
     
 env:
   PROJECT_ID: ${{ secrets.GKE_PROJECT }}
-  LOCATION: europe-west1-b
+  LOCATION: europe-west1
+  LOCATION_: europe-west1-b
   REPOSITORY: backend
   IMAGE: express
   GKE_CLUSTER: csgke
@@ -67,7 +68,7 @@ jobs:
       uses: google-github-actions/get-gke-credentials@main
       with:
         cluster_name: ${{ env.GKE_CLUSTER }}
-        location: ${{ env.LOCATION }}
+        location: ${{ env.LOCATION_ }}
         credentials: ${{ secrets.GKE_SA_KEY }}
     
     - name: Add commit hash
