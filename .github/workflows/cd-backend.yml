@@ -35,7 +35,7 @@ jobs:
         service_account_key: ${{ secrets.GKE_SA_KEY }}
       
     - name: Configure docker gcloud
-      run: gcloud auth configure-docker europe-west1-docker.pkg.dev
+      run: gcloud auth configure-docker $LOCATION-docker.pkg.dev
     
     - name: Setup Node
       uses: actions/setup-node@v2
