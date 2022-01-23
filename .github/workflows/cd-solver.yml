@@ -1,4 +1,4 @@
-name: CICD - Solver
+name: CD - Solver
 on:
   push:
     branches: [ main ]
