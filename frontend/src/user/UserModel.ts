@@ -4,4 +4,5 @@ export interface User {
     createdAt: number
 }
 
+
 export type UserRights = "DEFAULT" | "ADMIN"
