@@ -4,9 +4,9 @@ metadata:
   name: cloudsolver-ingress
   annotations:
     kubernetes.io/ingress.global-static-ip-name: cloudsolver-static-ip
-    networking.gke.io/managed-certificates: cloudsolver-managed-cert
+    #networking.gke.io/managed-certificates: cloudsolver-managed-cert
     kubernetes.io/ingress.allow-http: "true"
-    networking.gke.io/v1beta1.FrontendConfig: https-redirect-config
+    #networking.gke.io/v1beta1.FrontendConfig: https-redirect-config
 spec:
   rules:
   - host: cloudsolver.info
