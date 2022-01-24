@@ -373,8 +373,8 @@ function SolverConfiguration() {
             mznFileId: selected.mzn.get.id,
             dznFileId: selected.dzn.get.id,
             solvers: selectedSolvers,
-            vCPU: Number(vCPURef.current?.value) || undefined,
-            memory: Number(memoryRef.current?.value) || undefined,
+            vCPUMax: Number(vCPURef.current?.value) || undefined,
+            memoryMax: Number(memoryRef.current?.value) || undefined,
             config: flagsRef.current?.value
         });
     }

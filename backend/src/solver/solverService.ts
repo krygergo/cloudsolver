@@ -143,7 +143,6 @@ export const SolverService = (userId: string) => {
                     return createAndReturnJobId();
                 const availableMemory = user?.memoryMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.memoryMax, 0);
                 const availablevCPU = user?.vCPUMax! - jobs.reduce((total: number, nextJob: Job) => total + nextJob.vCPUMax, 0);
-                console.log(`Available vCPU: ${availablevCPU}`);
                 if(memoryUsage > availableMemory || vCPUUsage > availablevCPU) {
                     const job = createJob(mznFileId, dznFileId, memoryUsage, vCPUUsage, solvers, config, "QUEUED");
                     jobTransactions.addJob(job);

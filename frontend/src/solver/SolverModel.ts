@@ -6,7 +6,7 @@ export interface SolverJob {
     mznFileId: string
     dznFileId: string
     solvers: string[]
-    vCPU?: number
-    memory?: number
+    vCPUMax?: number
+    memoryMax?: number
     config?: string
 }
